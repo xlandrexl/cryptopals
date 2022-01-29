@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#define FILENAMEBUFFER 248
+
 //Characters used in base64 encoding
 const char b64chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 //Characters used in base64 decoding -- VERIFY!!!
@@ -22,9 +24,11 @@ char * bytes2hex(uint8_t * bytes, int size_bytes);
 char * bytes2b64(uint8_t * bytes, int size_bytes);
 uint8_t * b642bytes(char * b64, int * size_bytes);
 char * hex2b64(char * hex);
+uint8_t * b64file2bytes(char filename[] ,int * bytes_size);
 
 void print_dec(uint8_t * bytes , int n);
 void print_hex(uint8_t * bytes , int n);
+void print_char(uint8_t * bytes , int n);
 
 int hamming_distance_byte(uint8_t x, uint8_t y);
 int hamming_distance_str(char * str1 , char * str2);

@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "../include/basics.h"
+#include "../include/basics.h" 
 
 //Transforms an hexadecimal string into an array of bytes. 
 //Returns allocated bytes array and its size in size_bytes.
@@ -162,6 +162,38 @@ char * hex2b64(char * hex)
 	return b64;
 }
 
+uint8_t * b64file2bytes(char filename[FILENAMEBUFFER] ,int * bytes_size)
+{
+	FILE * fp;
+	int n;
+	char * b64;
+	uint8_t * bytes;
+	
+	//Open file
+	fp = fopen(filename, "r");
+	if (fp == NULL) {
+		printf("Error openning file\n"); 
+		return NULL;
+	}
+
+	//Read file to buffer
+	fseek(fp, 0, SEEK_END);
+  	n = ftell(fp);
+ 	fseek(fp, 0, SEEK_SET);
+	b64 = (char*)malloc((n + 1) * sizeof(char));
+	if(b64 == NULL){
+		printf("Error allocating memory for base64 string.\n");
+		return NULL;
+	}	
+	fread(b64, 1, n, fp);
+	
+	//Convert b64 to bytes
+	bytes = b642bytes(b64, &(*bytes_size));
+	free(b64);
+
+	return bytes;
+}
+
 //Prints decimal value of array of n bytes 
 void print_dec(uint8_t * bytes , int n)
 {
@@ -183,7 +215,20 @@ void print_hex(uint8_t * bytes , int n)
 	for(i = 0; i < n; i++){
 		printf("%02x " , bytes[i]);
 	}
-	printf("\n");
+	//printf("\n");
+	
+	return;
+}
+
+//Prints array of n bytes as string
+void print_char(uint8_t * bytes , int n)
+{
+	int i;
+
+	for(i = 0; i < n; i++){
+		printf("%c" , bytes[i]);
+	}
+	//printf("\n");
 	
 	return;
 }
@@ -215,6 +260,8 @@ int hamming_distance_str(char * str1 , char * str2)
     }
     return dist;
 }
+
+
 
 
 
