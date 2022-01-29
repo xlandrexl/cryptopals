@@ -278,11 +278,49 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
   /usr/include/gtest/gtest-test-part.h \
   /usr/include/gtest/gtest-typed-test.h \
   /usr/include/gtest/gtest_pred_impl.h \
-  ../src/set1_functions.cpp \
-  ../src/aux_functions.cpp
+  ../src/basics.cpp \
+  ../include/basics.h \
+  ../src/xor_ciphers.cpp \
+  /usr/include/c++/9/math.h \
+  /usr/include/c++/9/cmath \
+  /usr/include/math.h \
+  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
+  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
+  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
+  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
+  ../include/xor_ciphers.h
 
 
-../src/aux_functions.cpp:
+/usr/include/x86_64-linux-gnu/bits/iscanonical.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
+
+/usr/include/x86_64-linux-gnu/bits/fp-fast.h:
+
+/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
+
+/usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
+
+/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
+
+/usr/include/x86_64-linux-gnu/bits/math-vector.h:
+
+/usr/include/math.h:
+
+/usr/include/c++/9/cmath:
+
+/usr/include/c++/9/math.h:
+
+../src/xor_ciphers.cpp:
+
+../include/basics.h:
 
 /usr/include/gtest/gtest_pred_impl.h:
 
@@ -302,6 +340,8 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
 
 /usr/include/gtest/internal/gtest-type-util.h:
 
+../include/xor_ciphers.h:
+
 /usr/include/gtest/gtest-message.h:
 
 /usr/include/c++/9/set:
@@ -315,6 +355,8 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
 /usr/include/x86_64-linux-gnu/c++/9/bits/time_members.h:
 
 /usr/include/c++/9/ctime:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
 
 /usr/include/c++/9/bits/locale_facets_nonio.tcc:
 
@@ -466,6 +508,8 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
 
 /usr/include/c++/9/bits/stringfwd.h:
 
+../src/basics.cpp:
+
 /usr/include/c++/9/ext/atomicity.h:
 
 /usr/include/wchar.h:
@@ -495,8 +539,6 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
 /usr/include/c++/9/ios:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
-
-../src/set1_functions.cpp:
 
 /usr/include/gtest/internal/gtest-linked_ptr.h:
 

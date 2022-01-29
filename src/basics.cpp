@@ -3,8 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-//Characters used in base64 encoding
-const char b64chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+#include "../include/basics.h"
 
 //Transforms an hexadecimal string into an array of bytes. 
 //Returns allocated bytes array and its size in size_bytes.
@@ -101,6 +100,49 @@ char * bytes2b64(uint8_t * bytes, int size_bytes)
 	return b64;
 }
 
+//Transforms base64 encoded string into an array of bytes. 
+//Returns allocated array.
+//Returns NULL on error.
+uint8_t * b642bytes(char * b64, int * size_bytes)
+{
+	uint8_t * bytes = NULL;
+	long int val; //Assure it holds 3+ bytes!
+	
+	//Get size of bytes array
+	(*size_bytes) = (int)strlen(b64);
+	(*size_bytes) = (*size_bytes) / 4 * 3;
+	for(int i = (int)strlen(b64) - 1 ; i > 0 ; i--){
+		if(b64[i] == '='){
+			(*size_bytes) -= 1;
+		}else{	
+			break;
+		}
+	}
+
+	bytes = (uint8_t *)malloc( (*size_bytes) * sizeof(uint8_t));
+	if(bytes == NULL){
+		printf("Error allocating memory for base64 string.\n");
+		return NULL;
+	}	
+	
+	for(int i=0,j=0; i < (int)strlen(b64) ; i+=4 , j+=3){
+		/*  */
+		val = b64invs[b64[i]-43];
+		val = (val << 6) | b64invs[b64[i+1]-43];
+		val = b64[i+2]=='=' ? val << 6 : (val << 6) | b64invs[b64[i+2]-43];
+		val = b64[i+3]=='=' ? val << 6 : (val << 6) | b64invs[b64[i+3]-43];
+
+		/* */
+		bytes[j] = (val >> 16) & 0xFF;
+		if (b64[i+2] != '=')
+			bytes[j+1] = (val >> 8) & 0xFF;
+		if (b64[i+3] != '=')
+			bytes[j+2] = val & 0xFF;
+	}
+
+	return bytes;
+}
+
 //Transforms an hexadecimal string into a padded base64 encoded string. 
 //Returns allocated base64 string.
 //Returns NULL on error.
@@ -145,4 +187,42 @@ void print_hex(uint8_t * bytes , int n)
 	
 	return;
 }
+
+//Hamming distance between two bytes
+int hamming_distance_byte(uint8_t x, uint8_t y)
+{
+    int dist = 0;
+
+    // The ^ operators sets to 1 only the bits that are different
+    for (uint8_t val = x ^ y; val > 0; ++dist)
+    {
+        // We then count the bit set to 1 using the Peter Wegner way
+        val = val & (val - 1); // Set to zero val's lowest-order 1
+    }
+
+    return dist;
+}
+
+//Hamming distance between two strings
+int hamming_distance_str(char * str1 , char * str2)
+{
+	int i = 0, dist = 0;
+
+    while(str1[i]!='\0' && str2[i]!='\0')
+    {
+        dist += hamming_distance_byte(str1[i], str2[i]);
+        i++;
+    }
+    return dist;
+}
+
+
+
+
+
+
+
+
+
+
 

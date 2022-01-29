@@ -5,7 +5,9 @@
 #include <ctype.h>
 #include <math.h>
 
-#include "basics.cpp"
+#include "../include/basics.h"
+#include "../include/xor_ciphers.h"
+//#include "break_repeat_key_xor.cpp"
 
 //Produces bitwise XOR between two same-sized hexadecimal strings. 
 //Returns allocated hexadecimal string with the result.
@@ -69,14 +71,6 @@ float correlationCoefficient(float * X , float * Y, int n)
     return corr;
 }
 
-//Char freq is not being a perfect metric, but lets go on for now!
-// % Frequencies of A-Z   A		   B        C        D        E         F	     G        ...
-float english_freq[26] = {8.4966 , 2.0720 , 4.5388 , 3.3844 , 11.1607 , 1.8121 , 2.4705 , 3.0034 , 7.5448 , 0.1965 , 1.1016 , 5.4893 , 
-					      3.0129 , 6.6544 , 7.1635 , 3.1671 ,  0.1962 , 7.5809 , 5.7351 , 6.9509 , 3.6308 , 1.0074 , 1.2899 , 0.2902 , 
-					      1.7779 , 0.2722}; 
-
-char english_chars[26] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
-
 void count_char_freq(char * buf , float char_freq[26])
 {
 	char c;
@@ -112,7 +106,7 @@ char single_byte_xor_cipher(char * hex)
 	float corr_table[122-32];
 	char c;
 	
-	bytes = hex2bytes(hex, strlen(hex) , &size_bytes);
+	bytes = hex2bytes(hex , &size_bytes);
 	char * buf = (char*)malloc((size_bytes+1) * sizeof(char));	
 	buf[size_bytes] = '\0';
 
@@ -133,8 +127,6 @@ char single_byte_xor_cipher(char * hex)
 
 		printf("corr: %.3f\n" , corr_table[j]);	
 	}
-
-	int idx_max = maxIdx(corr_table , j);
 
 	//Find highest value in corr_table
 	float max = -1;
@@ -157,30 +149,59 @@ char single_byte_xor_cipher(char * hex)
 
 char * repeat_key_xor_cipher(char * in , char * key)
 {
-	char * buf = (char*)malloc( strlen(in) * sizeof(char));
+	uint8_t * buf = (uint8_t*)malloc( strlen(in) * sizeof(uint8_t));
 	int key_size = strlen(key);
-	char * hex;
+	char * hex = NULL;
 	
-	for(int i = 0; i < strlen(hex); i++)
+	for(int i = 0; i < (int)strlen(in); i++)
 	{
 		buf[i] = in[i] ^ key[i % key_size];
 	}
 
 	//Finish!
-	//hex =  bytes2hex(buf, strlen(hex))
-	print_hex(buf,strlen(hex));
-	return NULL;
+	hex = bytes2hex(buf, strlen(in));
+	//print_hex(buf,strlen(in));
+	return hex;
 }
 
+/*
 int main()
 {
 	//char hex[] = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
 	//char a = single_byte_xor_cipher(hex);
 
-	char hex[] = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
-	char key[] = "ICE";
+	//char hex[] = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
+	//char key[] = "ICE";
+
+	//char * ciphertext = repeat_key_xor_cipher(hex,key);
+	//printf("%s\n" , ciphertext);
+
+	//char str1[] = "this is a test";
+	//char str2[] = "wokka wokka!!!";
+
+	//int hd = hamming_distance_str(str1, str2);
+
+	//printf("Hamming Distance: %d\n", hd);
+
+	//int a = break_repeat_key_xor("../files/set1-chal6.txt");
+
+	/*int size_bytes;
+	char hex[] = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
+	uint8_t * bytes = hex2bytes(hex , &size_bytes);
+	
+	printf("Input bytes: ");
+	print_hex(bytes, size_bytes);
+	printf("Size bytes: %d\n" , size_bytes);
+
+	char * b64 = bytes2b64(bytes, size_bytes);
+	printf("\nB64 enc: %s\n" , b64);
+
+	int bytes_dec_size;
+	uint8_t * bytes_dec = b642bytes(b64, &bytes_dec_size);
+	printf("Dec bytes:   ");
+	print_hex(bytes_dec, bytes_dec_size);
 
 	return 1;
 }
-
+*/
 
