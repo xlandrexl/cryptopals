@@ -20,37 +20,6 @@ uint8_t * fixed_xor(uint8_t * bytes1 , uint8_t * bytes2, int bytes_size)
 	return bytes1;
 }
 
-//Produces bitwise XOR between two same-sized hexadecimal strings. 
-//Returns allocated hexadecimal string with the result.
-//Returns NULL on error.
-char * fixed_xor_hex(char * hex1 , char * hex2)
-{
-	int bytes_size;	
-	uint8_t * bytes1;
-	uint8_t * bytes2;
-	char * hex_out;
-
-	bytes1 = hex2bytes(hex1, &bytes_size);
-	if(bytes1 == NULL)
-		return NULL;
-	bytes2 = hex2bytes(hex2, &bytes_size);
-	if(bytes2 == NULL)
-	{
-		free(bytes1);
-		return NULL;
-	}
-
-	bytes1 = fixed_xor(bytes1 , bytes2, bytes_size);
-
-	hex_out = bytes2hex(bytes1, bytes_size);
-
-	free(bytes1);
-	free(bytes2);
-	
-	return hex_out;
-}
-
-
 //Returns correlation coefficient of two n-sized float arrays. 
 float correlationCoefficient(float * X , float * Y, int n)
 {
@@ -167,19 +136,6 @@ char single_byte_xor_cipher(uint8_t * bytes , int size_bytes)
 	free(buf);
 
 	return START_CHAR + idx_max;
-}
-
-char single_byte_xor_cipher_hex(char * hex)
-{
-	int size_bytes;
-	uint8_t * bytes = hex2bytes(hex, &size_bytes);
-	char c;
-
-	c = single_byte_xor_cipher(bytes , size_bytes);
-
-	free(bytes);	
-
-	return c;
 }
 
 char * repeat_key_xor_cipher(char * in , char * key)

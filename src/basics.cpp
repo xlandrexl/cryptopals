@@ -143,25 +143,6 @@ uint8_t * b642bytes(char * b64, int * size_bytes)
 	return bytes;
 }
 
-//Transforms an hexadecimal string into a padded base64 encoded string. 
-//Returns allocated base64 string.
-//Returns NULL on error.
-char * hex2b64(char * hex)
-{
-	uint8_t * bytes;
-	int size_bytes;	
-	char * b64;
-	
-	bytes = hex2bytes(hex, &size_bytes); 
-	if(bytes == NULL)
-		return NULL;
-
-	b64 = bytes2b64(bytes, size_bytes);
-	free(bytes);
-	
-	return b64;
-}
-
 uint8_t * b64file2bytes(char filename[FILENAMEBUFFER] ,int * bytes_size)
 {
 	FILE * fp;
@@ -194,6 +175,17 @@ uint8_t * b64file2bytes(char filename[FILENAMEBUFFER] ,int * bytes_size)
 	return bytes;
 }
 
+char * bytes2string(uint8_t * bytes , int n)
+{
+	char * str = NULL;
+
+	str = (char*)malloc((n+1) * sizeof(char));
+	str[n] = '\0';
+	memcpy(str, bytes, n);
+	
+	return str;
+}
+
 //Prints decimal value of array of n bytes 
 void print_dec(uint8_t * bytes , int n)
 {
@@ -219,6 +211,7 @@ void print_hex(uint8_t * bytes , int n)
 	
 	return;
 }
+
 
 //Prints array of n bytes as string
 void print_char(uint8_t * bytes , int n)
@@ -260,16 +253,3 @@ int hamming_distance_str(char * str1 , char * str2)
     }
     return dist;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

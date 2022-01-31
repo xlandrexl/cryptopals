@@ -93,6 +93,8 @@ test_EXTERNAL_OBJECTS =
 test: CMakeFiles/test.dir/tests.cpp.o
 test: CMakeFiles/test.dir/build.make
 test: /usr/lib/x86_64-linux-gnu/libgtest.a
+test: /usr/lib/x86_64-linux-gnu/libssl.so
+test: /usr/lib/x86_64-linux-gnu/libcrypto.so
 test: CMakeFiles/test.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/andre/Desktop/cryptopals/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable test"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/test.dir/link.txt --verbose=$(VERBOSE)

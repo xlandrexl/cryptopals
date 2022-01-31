@@ -1,10 +1,7 @@
 #ifndef BASICS_H
 #define BASICS_H
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdint.h>
-#include <string.h>
 
 #define FILENAMEBUFFER 248
 
@@ -23,8 +20,10 @@ uint8_t * hex2bytes(char * hex, int * size_bytes);
 char * bytes2hex(uint8_t * bytes, int size_bytes);
 char * bytes2b64(uint8_t * bytes, int size_bytes);
 uint8_t * b642bytes(char * b64, int * size_bytes);
-char * hex2b64(char * hex);
+
 uint8_t * b64file2bytes(char filename[] ,int * bytes_size);
+
+char * bytes2string(uint8_t * bytes , int n);
 
 void print_dec(uint8_t * bytes , int n);
 void print_hex(uint8_t * bytes , int n);
