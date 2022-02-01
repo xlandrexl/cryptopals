@@ -234,6 +234,8 @@ CMakeFiles/test.dir/tests.cpp.o: /home/andre/Desktop/cryptopals/tests.cpp \
  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
  /home/andre/Desktop/cryptopals/src/../include/xor_ciphers.h \
+ /home/andre/Desktop/cryptopals/src/xor_ciphers_break.cpp \
  /home/andre/Desktop/cryptopals/src/aes.cpp \
  /home/andre/Desktop/cryptopals/src/../include/aes.h \
+ /home/andre/Desktop/cryptopals/src/aes_break.cpp \
  /home/andre/Desktop/cryptopals/src/set1.cpp

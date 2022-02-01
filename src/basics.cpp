@@ -172,18 +172,89 @@ uint8_t * b64file2bytes(char filename[FILENAMEBUFFER] ,int * bytes_size)
 	bytes = b642bytes(b64, &(*bytes_size));
 	free(b64);
 
+	fclose(fp);
+
 	return bytes;
 }
 
-char * bytes2string(uint8_t * bytes , int n)
+//Separates contents in a file by the \n. Returns array of strings.
+char ** file2strings(char filename[FILENAMEBUFFER] , int * lines)
+{
+	FILE * fp;
+	char ** strings = NULL;
+	char * buffer = NULL;
+	int filesize;
+	int linesize;
+
+	//Open file
+	fp = fopen(filename, "r");
+	if (fp == NULL) {
+		printf("Error openning file\n"); 
+		return NULL;
+	}
+
+	//Read file to buffer
+	fseek(fp, 0, SEEK_END);
+  	filesize = ftell(fp);
+ 	fseek(fp, 0, SEEK_SET);
+	buffer = (char*)malloc((filesize + 1) * sizeof(char)); //+1 to have that nice \0 in the end
+	if(buffer == NULL){
+		printf("Error allocating memory for base64 string.\n");
+		return NULL;
+	}	
+	fread(buffer, 1, filesize, fp);
+
+	//Count number of lines
+	*lines = 0;
+	for(int i = 0; i < filesize; i++){
+		if(buffer[i] == '\n'){
+			*lines += 1;
+			buffer[i] = '\0'; //Then we can strcpy... Bit strange, but why not?
+		}
+	}
+
+	//Malloc lines
+	strings = (char**)malloc(*lines * sizeof(char*));
+	for(int i = 0, j = 0; i < *lines; i++){
+		linesize = strlen(buffer + j);
+		strings[i] = (char*)malloc(linesize * sizeof(char));
+		strcpy(strings[i], buffer + j);
+		j = j + linesize + 1;
+	}	
+
+	//Free buffer
+	free(buffer);	
+	fclose(fp);
+
+	/*Print to check
+	for(int i = 0; i < *lines; i++){
+		printf("Line %d: %s\n" , i, strings[i]);
+	}*/
+	
+	return strings;
+}
+
+char * bytes2string(uint8_t * bytes , int bytes_size)
 {
 	char * str = NULL;
 
-	str = (char*)malloc((n+1) * sizeof(char));
-	str[n] = '\0';
-	memcpy(str, bytes, n);
+	str = (char*)malloc((bytes_size+1) * sizeof(char));
+	str[bytes_size] = '\0';
+	memcpy(str, bytes, bytes_size);
 	
 	return str;
+}
+
+uint8_t * string2bytes(char * str , int * bytes_size)
+{
+	uint8_t * bytes = NULL;
+
+	(*bytes_size) = strlen(str);
+
+	bytes = (uint8_t *)malloc( (*bytes_size) * sizeof(uint8_t));
+	memcpy( bytes, str, (*bytes_size) );
+	
+	return bytes;
 }
 
 //Prints decimal value of array of n bytes 
@@ -205,7 +276,8 @@ void print_hex(uint8_t * bytes , int n)
 	int i;
 
 	for(i = 0; i < n; i++){
-		printf("%02x " , bytes[i]);
+		//printf("%02x " , bytes[i]);
+		printf("%02x" , bytes[i]);
 	}
 	//printf("\n");
 	
@@ -230,9 +302,10 @@ void print_char(uint8_t * bytes , int n)
 int hamming_distance_byte(uint8_t x, uint8_t y)
 {
     int dist = 0;
+	uint8_t val;
 
     // The ^ operators sets to 1 only the bits that are different
-    for (uint8_t val = x ^ y; val > 0; ++dist)
+    for (val = x ^ y; val > 0; ++dist)
     {
         // We then count the bit set to 1 using the Peter Wegner way
         val = val & (val - 1); // Set to zero val's lowest-order 1
@@ -242,7 +315,7 @@ int hamming_distance_byte(uint8_t x, uint8_t y)
 }
 
 //Hamming distance between two strings
-int hamming_distance_str(char * str1 , char * str2)
+/*int hamming_distance_str(char * str1 , char * str2)
 {
 	int i = 0, dist = 0;
 
@@ -250,6 +323,17 @@ int hamming_distance_str(char * str1 , char * str2)
     {
         dist += hamming_distance_byte(str1[i], str2[i]);
         i++;
+    }
+    return dist;
+}*/
+
+//Hamming distance between two byte arrays
+int hamming_distance(uint8_t * bytes1 , uint8_t * bytes2 , int bytes_size)
+{
+	int dist = 0;
+
+	for (int i = 0 ; i < bytes_size ; i++){
+        dist += hamming_distance_byte(bytes1[i], bytes2[i]);
     }
     return dist;
 }

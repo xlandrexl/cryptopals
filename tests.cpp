@@ -3,7 +3,9 @@
 
 #include "src/basics.cpp"
 #include "src/xor_ciphers.cpp"
+#include "src/xor_ciphers_break.cpp"
 #include "src/aes.cpp"
+#include "src/aes_break.cpp"
 #include "src/set1.cpp"
 
 //Challenge 1
@@ -43,6 +45,9 @@ TEST(Set1_Challenge5, Basic) {
 //Challenge 7 - Done, to do test. 
 
 //Challenge 8 not done
+
+//Challenge 9 - Done, to do test.
+//Challenge 10 - Done, to do test.  
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);

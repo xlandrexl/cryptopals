@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <openssl/aes.h>
+
+#include "../include/basics.h"
+#include "../include/aes.h"
+#include "../include/xor_ciphers.h"
+
+int count_colisions(uint8_t * bytes , int bytes_size)
+{
+	int cols = 0;
+	
+	//Pointer 1 to every first element of each block of the plaintext
+	for(int i = 0; i < (bytes_size - 16) ; i+=16){
+		//Pointer 2 to every sequent first element of each block of the plaintext
+		for(int j = i + 16; j < (bytes_size) ; j+=16){
+			if( memcmp(bytes + i , bytes + j , 16) == 0 ){
+				cols++;
+			}
+		}		
+	}	
+
+	return cols;
+} 
+
+int * count_colisions_strings(char ** strings , int nstrings)
+{
+	int * cols_table = NULL;
+
+	// Allocate table to store and fill it
+	cols_table = (int *)malloc(nstrings * sizeof(int));
+	for(int i = 0; i < nstrings ; i++){
+		cols_table[i] = count_colisions( (uint8_t *)strings[i] , strlen(strings[i]) );
+	}
+	
+	//Print to check
+	for(int i = 0; i < nstrings; i++){
+		printf("Line %d: %d\n" , i, cols_table[i]);
+	}
+	
+	return cols_table;
+}
+
+/*
+int main()
+{
+	
+	// Generate plaintext
+	int bytes_size = 64;
+	uint8_t * bytes = (uint8_t *)malloc(bytes_size * sizeof(uint8_t));
+
+	for(int i = 0; i < bytes_size ; i++){
+		//bytes[i] = i / 16;
+		bytes[i] = i % 32;
+	}
+	
+	// Test
+	int cols = count_colisions(bytes , bytes_size);
+	printf("Colisions: %d\n" , cols);
+	
+	 
+	int lines;
+	char ** strings = file2strings("../files/set1-chal8.txt" , &lines);
+
+	
+	int * cols_table = count_colisions_strings(strings , lines);
+	
+	return 0;
+}*/

@@ -12,9 +12,9 @@ char * challenge2(char * hex1 , char * hex2);
 char challenge3(char * hex);
 //challenge4 not done
 char * challenge5(char * in , char * key);
-//challenge6 on the way
+char * challenge6(char * filename);
 char * challenge7(char * filename , char * key);
-//challenge8 not done
+char * challenge8(char * filename);
 
 char * challenge1(char * in)
 {
@@ -65,7 +65,7 @@ char challenge3(char * hex)
 	uint8_t * bytes = hex2bytes(hex, &size_bytes);
 	char c;
 
-	c = single_byte_xor_cipher(bytes , size_bytes);
+	c = break_single_byte_xor(bytes , size_bytes);
 
 	free(bytes);	
 
@@ -76,12 +76,45 @@ char challenge3(char * hex)
 
 char * challenge5(char * in , char * key)
 {
-	char * hex = repeat_key_xor_cipher(in, key);
+	int in_size = strlen(in);
+	int key_size = strlen(key);
+	uint8_t * out;
+	char * out_hex;
 
-	return hex;
+	out = repeat_key_xor_cipher((uint8_t * )in, in_size, (uint8_t * )key, key_size);
+	out_hex = bytes2hex(out, in_size);
+	free(out);
+
+	return out_hex;
 }
 
-//challenge6 on the way
+char * challenge6(char * filename)
+{
+	//char filename[FILENAMEBUFFER] = "../files/set1-chal6.txt";
+	char * key;
+	uint8_t * bytes;
+	int bytes_size;
+	uint8_t * decrypted_bytes;
+	char * str_out;
+
+	//Read file
+	bytes = b64file2bytes(filename , &bytes_size);
+
+	//Calculate key
+	key = break_repeat_key_xor(bytes , bytes_size);
+
+	//Decrypt it
+	decrypted_bytes = repeat_key_xor_cipher(bytes, bytes_size, (uint8_t *)key, strlen(key));
+	
+	//Convert to string
+	str_out = bytes2string( decrypted_bytes , bytes_size);
+
+	free(decrypted_bytes);
+	free(bytes);
+	free(key);
+	
+	return str_out;
+}
 
 char * challenge7(char * filename , char * key)
 {
@@ -114,4 +147,37 @@ char * challenge7(char * filename , char * key)
 	return str_out;
 }
 
-//challenge8 not done
+char * challenge8(char * filename)
+{
+	//char filename[FILENAMEBUFFER] = "../files/set1-chal8.txt";
+
+	int lines;
+	char ** strings = file2strings(filename , &lines);
+	int * cols_table = count_colisions_strings(strings , lines);
+	int max = -1;
+	int max_idx = -1;
+	char * ret;
+	int retsize;
+
+	//find max
+	for(int i = 0; i < lines ; i++){
+		if(cols_table[i] > max){
+			max = cols_table[i];
+			max_idx = i;
+		}
+	}
+
+	//copy from strings[i] to ret so we can free remaining memory
+	retsize = strlen(strings[max_idx]);
+	ret = (char*)malloc( (retsize+1) * sizeof(char));
+	ret[retsize] = '\0';
+	strcpy(ret, strings[max_idx]);
+	
+	//free what we can free
+	for(int i = 0; i < lines ; i++){
+		free(strings[i]);
+	}
+	free(strings);
+
+	return ret;
+}

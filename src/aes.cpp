@@ -105,23 +105,6 @@ void cbc_decrypt(uint8_t * ct , uint8_t * pt , int bytes , uint8_t key[KEY_SIZE]
 	return;
 }
 
-void cbc_decrypt_file( char filename[FILENAMEBUFFER] , uint8_t local_key[KEY_SIZE] , uint8_t iv[AES_BLOCK_SIZE])
-{
-	//uint8_t local_key[]={'Y','E','L','L','O','W',' ','S','U','B','M','A','R','I','N','E'};
-	//char filename[FILENAMEBUFFER] = "../files/set2-chal10.txt";
-	//uint8_t iv[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-
-	int aes_input_size;
-	uint8_t * aes_input = b64file2bytes(filename , &aes_input_size);
-	
-	/* Buffers for Decryption */
-	uint8_t * dec_out = (uint8_t*)malloc(aes_input_size * sizeof(uint8_t));
-	cbc_decrypt( aes_input , dec_out, aes_input_size , local_key , iv);
-
-	print_char(dec_out , aes_input_size); //May be intersting to return as string!
-	return;
-}
-
 void gen_key(uint8_t key[KEY_SIZE])
 {
 	for(int i = 0; i < KEY_SIZE ;i++)
@@ -165,17 +148,33 @@ uint8_t * pkcs_bef(uint8_t * pt , int pt_size , int ct_size)
 	return pt;
 }
 
-uint8_t * validate_pkcs(uint8_t * pt , int pt_size , int ct_size)
+//Takes as input the plaintext and its size (pt_size)
+uint8_t * validate_pkcs(uint8_t * pt , int * pt_size , int * valid)
 {
-	int count = ct_size - pt_size;
-	if(count <= 0)
-		return NULL;
+	int count;
 
-	pt = (uint8_t *)realloc(pt, ct_size);
+	//Whats the padding number? Lets check the last index
+	count = pt[ (*pt_size) - 1];
 
-	for(int i = pt_size ; i < ct_size ; i++){
-		pt[i] = count;
+	//Is it a pad number? If not, we can return!
+	if(count <= 0 || count >= (AES_BLOCK_SIZE)){
+		*valid = 1;
+		return pt;
 	}
+
+	//Are all count numbers before the same?
+	for(int i = (*pt_size) - 1 ; i > (*pt_size) - 1 - count ; i--){
+		if(pt[i] != count){
+			//Invalid!
+			*valid = 0;
+			return pt;
+		}
+	}
+
+	//Otherwise, lets just remove them and return 
+	pt = (uint8_t *)realloc(pt, (*pt_size) - count);
+	(*pt_size) = (*pt_size) - count;
+	*valid = 1;
 	
 	return pt;
 }
@@ -218,58 +217,3 @@ uint8_t * ecb_cbc_encrypt(uint8_t * pt , int in_bytes , int * out_bytes)
 	
 	return ct;
 }
-
-/*int main()
-{
-	//srand((unsigned) time(&t));
-
-	// Input data 
-	uint8_t local_key[]={'Y','E','L','L','O','W',' ','S','U','B','M','A','R','I','N','E'};
-	uint8_t iv[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	char filename[FILENAMEBUFFER] = "../files/set2-chal10.txt";
-	
-	//cbc_decrypt_file(filename, local_key,iv);
-	
-	//int n = 13;
-	uint8_t * pt = (uint8_t *)malloc(n * sizeof(uint8_t));
-	for(int i = 0; i < n ; i++)
-		pt[i] = local_key[i]; 
-
-	printf("\nBefore: \t");
-	print_hex(pt , n); 
-	pt = pkcs_bef( pt , n , 16);
-	printf("\n After: \t");
-	print_hex(pt , 16);
-	printf("\n");
-
-	printf("\nBefore: \t");
-	print_hex(local_key , 16); 
-	gen_key(local_key);
-	printf("\n After: \t");
-	print_hex(local_key , 16); 
-	
-
-	//char filename[FILENAMEBUFFER] = "../files/set1-chal7.txt";
-	//ecb_decrypt_file( filename, local_key);
-	
-	//int n = 32;
-	uint8_t * pt = (uint8_t *)malloc(n * sizeof(uint8_t));
-	uint8_t * ct = (uint8_t *)malloc(n * sizeof(uint8_t));
-	uint8_t * rec = (uint8_t *)malloc(n * sizeof(uint8_t));
-	for(int i = 0; i < n ; i++)
-		pt[i] = 'A'; 
-
-	printf("\nPlaintext: \t");
-	print_char(pt , n); 
-
-	cbc_encrypt(pt , ct , n , local_key , iv);
-	printf("\nCiphertext: \t");
-	print_char(ct , n); 
-
-	cbc_decrypt(ct , rec , n , local_key , iv);
-	printf("\nRecovered: \t");
-	print_char(rec , n); 
-
-	
-	return 0;
-}*/
