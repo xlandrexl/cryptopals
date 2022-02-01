@@ -1,6 +1,6 @@
-CMakeFiles/test.dir/tests.cpp.o: /home/andre/Desktop/cryptopals/tests.cpp \
- /usr/include/stdc-predef.h /usr/include/gtest/gtest.h \
- /usr/include/c++/9/limits \
+CMakeFiles/test.dir/tests_main.cpp.o: \
+ /home/andre/Desktop/cryptopals/tests_main.cpp /usr/include/stdc-predef.h \
+ /usr/include/gtest/gtest.h /usr/include/c++/9/limits \
  /usr/include/x86_64-linux-gnu/c++/9/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/9/bits/os_defines.h \
  /usr/include/features.h /usr/include/x86_64-linux-gnu/sys/cdefs.h \
@@ -217,9 +217,7 @@ CMakeFiles/test.dir/tests.cpp.o: /home/andre/Desktop/cryptopals/tests.cpp \
  /usr/include/gtest/internal/gtest-param-util-generated.h \
  /usr/include/gtest/gtest_prod.h /usr/include/gtest/gtest-test-part.h \
  /usr/include/gtest/gtest-typed-test.h \
- /usr/include/gtest/gtest_pred_impl.h /usr/include/openssl/aes.h \
- /usr/include/x86_64-linux-gnu/openssl/opensslconf.h \
- /usr/include/openssl/opensslv.h \
+ /usr/include/gtest/gtest_pred_impl.h \
  /home/andre/Desktop/cryptopals/src/basics.c \
  /home/andre/Desktop/cryptopals/src/../include/basics.h \
  /home/andre/Desktop/cryptopals/src/xor_ciphers.c \
@@ -235,9 +233,12 @@ CMakeFiles/test.dir/tests.cpp.o: /home/andre/Desktop/cryptopals/tests.cpp \
  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
  /home/andre/Desktop/cryptopals/src/../include/xor_ciphers.h \
  /home/andre/Desktop/cryptopals/src/xor_ciphers_break.c \
- /home/andre/Desktop/cryptopals/src/aes.c \
+ /home/andre/Desktop/cryptopals/src/aes.c /usr/include/openssl/aes.h \
+ /usr/include/x86_64-linux-gnu/openssl/opensslconf.h \
+ /usr/include/openssl/opensslv.h \
  /home/andre/Desktop/cryptopals/src/../include/aes.h \
  /home/andre/Desktop/cryptopals/src/aes_break.c \
  /home/andre/Desktop/cryptopals/src/set1.c \
  /home/andre/Desktop/cryptopals/src/set2.c \
- /home/andre/Desktop/cryptopals/src/set3.c
+ /home/andre/Desktop/cryptopals/tests_set1.h \
+ /home/andre/Desktop/cryptopals/tests_set2.h

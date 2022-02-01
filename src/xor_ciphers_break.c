@@ -9,7 +9,8 @@
 #include "../include/xor_ciphers.h"
 
 #define INF 1000
-
+#define NCHARS 27
+static const char english_famous_chars[NCHARS] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', ' '};
 
 int get_score(uint8_t * bytes , int size_bytes)
 {
@@ -173,40 +174,3 @@ char * break_repeat_key_xor(uint8_t * bytes , int bytes_size)
 
 	return key;
 }
-
-/*b64 it
-int main()
-{	
-	//char pt_asci[] = "Now transpose the blocks: make a block that is the first byte of every block, and a block that is the second byte of every block, and so on.";
-	//char mykey[] = "Hello";
-	//char * ct_asci; //060a1b4c1b3a04021f1f2716094c1b20004c0e032706071f5568080d070a68044c0e032706074c1b2004184c063b4518040a6803051e1c3c450e151b2d45030a4f2d13091e16680700030c23494c0d012c450d4c0d240a0f074f3c0d0d184f21164c18072d451f090c270b084c0d3111094c002e45091a0a3a1c4c0e03270607404f290b084c1c2745030241
-	//char * ct_b64;
-	
-	int bytes_size;
-	uint8_t * bytes;
-	char * key;
-	char filename[124] = "../files/set1-chal6.txt";
-	uint8_t * plaintext;
-
-	//Encrypt it and b64 it
-	//ct_asci = repeat_key_xor_cipher(pt_asci,mykey);
-	//bytes = hex2bytes(ct_asci, &bytes_size);
-	//ct_b64 = bytes2b64(bytes, bytes_size);
-	//bytes = b642bytes(ct_b64, &bytes_size);
-
-	bytes = b64file2bytes(filename , &bytes_size);
-
-	//Get key
-	key = break_repeat_key_xor(bytes , bytes_size);
-
-	//Decrypt file
-	plaintext = repeat_key_xor_cipher(bytes, bytes_size, (uint8_t *)key, strlen(key));
-
-	printf("key: %s\n" , key);
-	print_char(plaintext, bytes_size);
-
-	free(key);
-	free(plaintext);
-
-	return 0;
-}*/

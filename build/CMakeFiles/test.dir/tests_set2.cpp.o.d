@@ -1,6 +1,6 @@
-CMakeFiles/test.dir/tests.cpp.o: /home/andre/Desktop/cryptopals/tests.cpp \
- /usr/include/stdc-predef.h /usr/include/gtest/gtest.h \
- /usr/include/c++/9/limits \
+CMakeFiles/test.dir/tests_set2.cpp.o: \
+ /home/andre/Desktop/cryptopals/tests_set2.cpp /usr/include/stdc-predef.h \
+ /usr/include/gtest/gtest.h /usr/include/c++/9/limits \
  /usr/include/x86_64-linux-gnu/c++/9/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/9/bits/os_defines.h \
  /usr/include/features.h /usr/include/x86_64-linux-gnu/sys/cdefs.h \
@@ -239,5 +239,4 @@ CMakeFiles/test.dir/tests.cpp.o: /home/andre/Desktop/cryptopals/tests.cpp \
  /home/andre/Desktop/cryptopals/src/../include/aes.h \
  /home/andre/Desktop/cryptopals/src/aes_break.c \
  /home/andre/Desktop/cryptopals/src/set1.c \
- /home/andre/Desktop/cryptopals/src/set2.c \
- /home/andre/Desktop/cryptopals/src/set3.c
+ /home/andre/Desktop/cryptopals/src/set2.c

@@ -5,6 +5,16 @@
 
 #include "../include/basics.h" 
 
+//Characters used in base64 encoding
+static const char b64chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+//Characters used in base64 decoding -- VERIFY!!!
+static const int b64invs[] = { 62, -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58,
+					   59, 60, 61, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5,
+						6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+					  	21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1, 26, 27, 28,
+						29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
+						43, 44, 45, 46, 47, 48, 49, 50, 51 };
+
 //Transforms an hexadecimal string into an array of bytes. 
 //Returns allocated bytes array and its size in size_bytes.
 //Returns NULL on error.
@@ -107,9 +117,32 @@ uint8_t * b642bytes(char * b64, int * size_bytes)
 {
 	uint8_t * bytes = NULL;
 	long int val; //Assure it holds 3+ bytes!
+	int b64len = strlen(b64);
+	int valid;
+
+	//Verify length
+	if(b64len % 4 != 0){
+		printf("Invalid input length for base64 string.\n");
+		return NULL;
+	}
 	
+	//Verify characters
+	for(int i = 0 ; i < b64len ; i++){
+		valid = 0;
+		for(int j = 0 ; j < strlen(b64chars) ; j++){
+			if(b64[i] == b64chars[j]){
+				valid = 1;
+				break;
+			}
+		}
+		if(valid == 0){
+			printf("Invalid input character for base64 string.\n");
+			return NULL;
+		}
+	}
+
 	//Get size of bytes array
-	(*size_bytes) = (int)strlen(b64);
+	(*size_bytes) = b64len;
 	(*size_bytes) = (*size_bytes) / 4 * 3;
 	for(int i = (int)strlen(b64) - 1 ; i > 0 ; i--){
 		if(b64[i] == '='){
@@ -121,11 +154,11 @@ uint8_t * b642bytes(char * b64, int * size_bytes)
 
 	bytes = (uint8_t *)malloc( (*size_bytes) * sizeof(uint8_t));
 	if(bytes == NULL){
-		printf("Error allocating memory for base64 string.\n");
+		printf("Error allocating memory for bytes array.\n");
 		return NULL;
 	}	
 	
-	for(int i=0,j=0; i < (int)strlen(b64) ; i+=4 , j+=3){
+	for(int i=0,j=0; i < b64len ; i+=4 , j+=3){
 		/*  */
 		val = b64invs[b64[i]-43];
 		val = (val << 6) | b64invs[b64[i+1]-43];
@@ -143,13 +176,13 @@ uint8_t * b642bytes(char * b64, int * size_bytes)
 	return bytes;
 }
 
-uint8_t * b64file2bytes(char filename[FILENAMEBUFFER] ,int * bytes_size)
+uint8_t * b64file2bytes(char * filename ,int * bytes_size)
 {
 	FILE * fp;
 	int n;
 	char * b64;
 	uint8_t * bytes;
-	
+
 	//Open file
 	fp = fopen(filename, "r");
 	if (fp == NULL) {
@@ -161,13 +194,18 @@ uint8_t * b64file2bytes(char filename[FILENAMEBUFFER] ,int * bytes_size)
 	fseek(fp, 0, SEEK_END);
   	n = ftell(fp);
  	fseek(fp, 0, SEEK_SET);
-	b64 = (char*)malloc((n + 1) * sizeof(char));
+	b64 = (char*)malloc((n) * sizeof(char));
 	if(b64 == NULL){
 		printf("Error allocating memory for base64 string.\n");
 		return NULL;
 	}	
-	fread(b64, 1, n, fp);
 	
+	int read_bytes = fread(b64, 1, n, fp);
+	b64[n-1] = '\0'; //Idk why, im getting one more char than desired.
+
+	//printf("%s" , b64);
+	//printf("File size: %d \nRead bytes: %d \nStrlen: %d\n" , n , read_bytes, strlen(b64));
+
 	//Convert b64 to bytes
 	bytes = b642bytes(b64, &(*bytes_size));
 	free(b64);
@@ -178,7 +216,7 @@ uint8_t * b64file2bytes(char filename[FILENAMEBUFFER] ,int * bytes_size)
 }
 
 //Separates contents in a file by the \n. Returns array of strings.
-char ** file2strings(char filename[FILENAMEBUFFER] , int * lines)
+char ** file2strings(char * filename , int * lines)
 {
 	FILE * fp;
 	char ** strings = NULL;

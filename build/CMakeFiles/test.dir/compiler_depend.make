@@ -281,9 +281,9 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
   /usr/include/openssl/aes.h \
   /usr/include/x86_64-linux-gnu/openssl/opensslconf.h \
   /usr/include/openssl/opensslv.h \
-  ../src/basics.cpp \
+  ../src/basics.c \
   ../include/basics.h \
-  ../src/xor_ciphers.cpp \
+  ../src/xor_ciphers.c \
   /usr/include/c++/9/math.h \
   /usr/include/c++/9/cmath \
   /usr/include/math.h \
@@ -297,16 +297,24 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
   /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
   /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
   ../include/xor_ciphers.h \
-  ../src/xor_ciphers_break.cpp \
-  ../src/aes.cpp \
+  ../src/xor_ciphers_break.c \
+  ../src/aes.c \
   ../include/aes.h \
-  ../src/aes_break.cpp \
-  ../src/set1.cpp
+  ../src/aes_break.c \
+  ../src/set1.c \
+  ../src/set2.c \
+  ../src/set3.c
 
 
-../src/set1.cpp:
+../src/set3.c:
+
+../src/set2.c:
 
 ../include/aes.h:
+
+../src/aes.c:
+
+../src/xor_ciphers_break.c:
 
 /usr/include/x86_64-linux-gnu/bits/iscanonical.h:
 
@@ -330,9 +338,9 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
 
 /usr/include/c++/9/math.h:
 
-../src/xor_ciphers.cpp:
-
 ../include/basics.h:
+
+../src/basics.c:
 
 /usr/include/x86_64-linux-gnu/openssl/opensslconf.h:
 
@@ -409,8 +417,6 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
 /usr/include/x86_64-linux-gnu/bits/types/sig_atomic_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/signum.h:
-
-../src/aes_break.cpp:
 
 /usr/include/signal.h:
 
@@ -527,8 +533,6 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
 /usr/include/c++/9/bits/stl_algobase.h:
 
 /usr/include/c++/9/bits/stringfwd.h:
-
-../src/basics.cpp:
 
 /usr/include/c++/9/ext/atomicity.h:
 
@@ -702,8 +706,6 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
 
 /usr/include/c++/9/type_traits:
 
-../src/aes.cpp:
-
 /usr/include/c++/9/bits/cxxabi_init_exception.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
@@ -824,6 +826,8 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
 
 /usr/include/c++/9/bits/basic_string.tcc:
 
+../src/aes_break.c:
+
 /usr/include/gtest/internal/gtest-filepath.h:
 
 /usr/include/c++/9/system_error:
@@ -845,8 +849,6 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
 /usr/include/c++/9/bits/basic_ios.tcc:
 
 /usr/include/c++/9/bits/istream.tcc:
-
-../src/xor_ciphers_break.cpp:
 
 /usr/lib/gcc/x86_64-linux-gnu/9/include/stdint.h:
 
@@ -874,6 +876,8 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
 
 /usr/include/string.h:
 
+../src/xor_ciphers.c:
+
 /usr/include/x86_64-linux-gnu/sys/stat.h:
 
 /usr/include/x86_64-linux-gnu/bits/stat.h:
@@ -885,6 +889,8 @@ CMakeFiles/test.dir/tests.cpp.o: ../tests.cpp \
 /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
 
 /usr/include/c++/9/utility:
+
+../src/set1.c:
 
 /usr/include/c++/9/bits/stl_relops.h:
 

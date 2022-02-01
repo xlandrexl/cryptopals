@@ -105,6 +105,41 @@ void cbc_decrypt(uint8_t * ct , uint8_t * pt , int bytes , uint8_t key[KEY_SIZE]
 	return;
 }
 
+
+void ctr_encrypt(uint8_t * pt , uint8_t * ct , int bytes , uint8_t key[KEY_SIZE] , uint64_t nonce)
+{
+	uint64_t in[2]; //So we just divide it in 2 easy. nonce || counter
+	uint8_t * out = (uint8_t *)malloc(AES_BLOCK_SIZE * sizeof(uint8_t));
+	int rem_bytes;
+	
+	//Fill buffer with nonce and counter
+	in[0] = nonce;
+
+	// Prepare AES-128 bit ECB Encryption 
+	AES_KEY prv_key;
+	AES_set_encrypt_key(key, KEY_SIZE * 8, &prv_key); // Size of key is in bits
+	
+	in[1] = 0; //Initialize counter
+	for(int i = 0 ; i < bytes ; i+=AES_BLOCK_SIZE){
+		AES_ecb_encrypt((uint8_t*)in, out, &prv_key, AES_ENCRYPT); //Encrypt the "iv" 
+
+		rem_bytes = (bytes - i > 16) ? 16 : bytes - i; //Is there less than 16 bytes in this block?
+	
+		out = fixed_xor(out, pt + (i*AES_BLOCK_SIZE), rem_bytes); //XOR output with plaintext block	
+		memcpy(ct + (i*AES_BLOCK_SIZE) , out , rem_bytes); //Copy it to ct
+		in[1] += 1; //Increment counter
+	}
+
+	free(out);
+}
+
+void ctr_decrypt(uint8_t * ct , uint8_t * pt , int bytes , uint8_t key[KEY_SIZE] , uint64_t nonce)
+{
+	ctr_encrypt(ct , pt , bytes , key , nonce);
+	return;
+}
+
+
 void gen_key(uint8_t key[KEY_SIZE])
 {
 	for(int i = 0; i < KEY_SIZE ;i++)
@@ -124,6 +159,8 @@ uint8_t * pkcs(uint8_t * pt , int pt_size , int ct_size)
 	pt = (uint8_t *)realloc(pt, ct_size);
 
 	for(int i = pt_size ; i < ct_size ; i++){
+		//pt[i] = 'H';
+		//pt[i] = '\x00';
 		pt[i] = count;
 	}
 	
@@ -178,7 +215,6 @@ uint8_t * validate_pkcs(uint8_t * pt , int * pt_size , int * valid)
 	
 	return pt;
 }
-
 
 uint8_t * ecb_cbc_encrypt(uint8_t * pt , int in_bytes , int * out_bytes)
 {

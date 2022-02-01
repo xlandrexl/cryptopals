@@ -282,9 +282,9 @@ CMakeFiles/test.dir/tests.cpp.o
  /usr/include/openssl/aes.h
  /usr/include/x86_64-linux-gnu/openssl/opensslconf.h
  /usr/include/openssl/opensslv.h
- /home/andre/Desktop/cryptopals/src/basics.cpp
+ /home/andre/Desktop/cryptopals/src/basics.c
  /home/andre/Desktop/cryptopals/include/basics.h
- /home/andre/Desktop/cryptopals/src/xor_ciphers.cpp
+ /home/andre/Desktop/cryptopals/src/xor_ciphers.c
  /usr/include/c++/9/math.h
  /usr/include/c++/9/cmath
  /usr/include/math.h
@@ -298,9 +298,11 @@ CMakeFiles/test.dir/tests.cpp.o
  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h
  /usr/include/x86_64-linux-gnu/bits/iscanonical.h
  /home/andre/Desktop/cryptopals/include/xor_ciphers.h
- /home/andre/Desktop/cryptopals/src/xor_ciphers_break.cpp
- /home/andre/Desktop/cryptopals/src/aes.cpp
+ /home/andre/Desktop/cryptopals/src/xor_ciphers_break.c
+ /home/andre/Desktop/cryptopals/src/aes.c
  /home/andre/Desktop/cryptopals/include/aes.h
- /home/andre/Desktop/cryptopals/src/aes_break.cpp
- /home/andre/Desktop/cryptopals/src/set1.cpp
+ /home/andre/Desktop/cryptopals/src/aes_break.c
+ /home/andre/Desktop/cryptopals/src/set1.c
+ /home/andre/Desktop/cryptopals/src/set2.c
+ /home/andre/Desktop/cryptopals/src/set3.c
 
