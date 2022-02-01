@@ -129,7 +129,7 @@ uint8_t * b642bytes(char * b64, int * size_bytes)
 	//Verify characters
 	for(int i = 0 ; i < b64len ; i++){
 		valid = 0;
-		for(int j = 0 ; j < strlen(b64chars) ; j++){
+		for(int j = 0 ; j < (int)strlen(b64chars) ; j++){
 			if(b64[i] == b64chars[j]){
 				valid = 1;
 				break;
@@ -144,7 +144,7 @@ uint8_t * b642bytes(char * b64, int * size_bytes)
 	//Get size of bytes array
 	(*size_bytes) = b64len;
 	(*size_bytes) = (*size_bytes) / 4 * 3;
-	for(int i = (int)strlen(b64) - 1 ; i > 0 ; i--){
+	for(int i = b64len - 1 ; i > 0 ; i--){
 		if(b64[i] == '='){
 			(*size_bytes) -= 1;
 		}else{	
@@ -179,9 +179,11 @@ uint8_t * b642bytes(char * b64, int * size_bytes)
 uint8_t * b64file2bytes(char * filename ,int * bytes_size)
 {
 	FILE * fp;
-	int n;
+	int filesize;
 	char * b64;
 	uint8_t * bytes;
+	int count;
+	char ch;
 
 	//Open file
 	fp = fopen(filename, "r");
@@ -190,21 +192,30 @@ uint8_t * b64file2bytes(char * filename ,int * bytes_size)
 		return NULL;
 	}
 
-	//Read file to buffer
+	//Get size of file and allocate buffer
 	fseek(fp, 0, SEEK_END);
-  	n = ftell(fp);
+  	filesize = ftell(fp);
  	fseek(fp, 0, SEEK_SET);
-	b64 = (char*)malloc((n) * sizeof(char));
+	b64 = (char*)malloc((filesize) * sizeof(char));
 	if(b64 == NULL){
 		printf("Error allocating memory for base64 string.\n");
 		return NULL;
 	}	
 	
-	int read_bytes = fread(b64, 1, n, fp);
-	b64[n-1] = '\0'; //Idk why, im getting one more char than desired.
+	//Read char by char to avoid \n
+	count = 0;
+	while(!feof(fp)){
+  		ch = fgetc(fp);
+		if(ch == '\n'){ //Can add other characters to avoid!
+    		continue;
+  		}
+		b64[count] = ch;
+		count++;
+	}
+	b64[count-1] = '\0'; //Put \0 in the end. I always read one more byte than I want...
 
-	//printf("%s" , b64);
-	//printf("File size: %d \nRead bytes: %d \nStrlen: %d\n" , n , read_bytes, strlen(b64));
+	printf("%s" , b64);
+	printf("File size: %d \nRead bytes: %d \nStrlen: %d\n" , filesize , count, (int)strlen(b64));
 
 	//Convert b64 to bytes
 	bytes = b642bytes(b64, &(*bytes_size));
@@ -221,8 +232,10 @@ char ** file2strings(char * filename , int * lines)
 	FILE * fp;
 	char ** strings = NULL;
 	char * buffer = NULL;
-	int filesize;
 	int linesize;
+	int len;
+	int line;
+	char ch;
 
 	//Open file
 	fp = fopen(filename, "r");
@@ -231,34 +244,29 @@ char ** file2strings(char * filename , int * lines)
 		return NULL;
 	}
 
-	//Read file to buffer
-	fseek(fp, 0, SEEK_END);
-  	filesize = ftell(fp);
- 	fseek(fp, 0, SEEK_SET);
-	buffer = (char*)malloc((filesize + 1) * sizeof(char)); //+1 to have that nice \0 in the end
-	if(buffer == NULL){
-		printf("Error allocating memory for base64 string.\n");
-		return NULL;
-	}	
-	fread(buffer, 1, filesize, fp);
-
-	//Count number of lines
+	//Count lines in file
 	*lines = 0;
-	for(int i = 0; i < filesize; i++){
-		if(buffer[i] == '\n'){
-			*lines += 1;
-			buffer[i] = '\0'; //Then we can strcpy... Bit strange, but why not?
-		}
+	while(!feof(fp)){
+  		ch = fgetc(fp);
+		if(ch == '\n'){
+    		*lines += 1;
+  		}
 	}
+	fseek(fp, 0, SEEK_SET);
 
 	//Malloc lines
 	strings = (char**)malloc(*lines * sizeof(char*));
-	for(int i = 0, j = 0; i < *lines; i++){
-		linesize = strlen(buffer + j);
-		strings[i] = (char*)malloc(linesize * sizeof(char));
-		strcpy(strings[i], buffer + j);
-		j = j + linesize + 1;
-	}	
+	
+	line = 0;
+	while ((linesize = getline(&buffer, (size_t*)&len, fp)) != -1) {
+        //printf("Retrieved line of length %zu:\n", read);
+        //printf("%s", line);
+	
+		strings[line] = (char*)malloc(linesize * sizeof(char)); //Linesize includes \n but not \0... We will just substitute it later
+		memcpy(strings[line], buffer, linesize);
+		strings[line][linesize-1] = '\0';
+		line++;
+    }	
 
 	//Free buffer
 	free(buffer);	

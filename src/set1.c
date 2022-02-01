@@ -16,9 +16,8 @@ int challenge6(char * filename);
 int challenge7(char * filename , char * key);
 int challenge8(char * filename);
 
-
 //valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./test
-/*int main()
+int main()
 {	
 	int ret = 0;
 
@@ -37,7 +36,7 @@ int challenge8(char * filename);
 	//ret = challenge5(in4,key0);
 
 	char filename0[] = "../files/set1-chal6.txt";
-	//char filename00[] = "../files/set1-chal6o.txt";
+	char filename00[] = "../files/set1-chal6o.txt";
 	ret = challenge6(filename0);
 
 	char filename1[] = "../files/set1-chal7.txt";
@@ -48,7 +47,7 @@ int challenge8(char * filename);
 	//ret = challenge8(filename2);	
 	
 	return ret;
-}*/
+}
 
 int challenge1(char * in)
 {
@@ -225,6 +224,7 @@ int challenge8(char * filename)
 		free(strings[i]);
 	}
 	free(strings);
+	free(cols_table);
 
 	return 1;
 }
