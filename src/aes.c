@@ -173,16 +173,13 @@ uint8_t * pkcs(uint8_t * pt , int pt_size , int ct_size)
 		return NULL;
 
 	//Malloc new pt
-	temp = (uint8_t *)malloc( ct_size * sizeof(uint8_t));
+	temp = (uint8_t *)malloc( ct_size * sizeof(uint8_t)); //Can be a realoc
 
 	for(int i = 0 ; i < pt_size ; i++){ //Can be a memcpy
 		temp[i] = pt[i];
 	}
 	for(int i = pt_size ; i < ct_size ; i++){
-		//pt[i] = 'H';
-		//pt[i] = '\x00';
-		//temp[i] = count;
-		temp[i] = 'H';
+		temp[i] = count;
 	}
 
 	free(pt);

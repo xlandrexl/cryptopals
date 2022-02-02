@@ -121,7 +121,7 @@ TEST(Set1_Challenge8, Basic) {
 } 
 
 //SET 2
-/*Challenge 9
+//Challenge 9
 TEST(Set2_Challenge9, Basic) {
 	char pt[]="YELLOW SUBMARINE";
 	int pad = 20;
@@ -134,7 +134,7 @@ TEST(Set2_Challenge9, Basic) {
 
 	ASSERT_TRUE( ret == 1 );
 	ASSERT_TRUE( memcmp(output.c_str(), exp_out, pad) == 0 );
-} */
+} 
 
 //Challenge 10 - How to properly test, without the solution?
 TEST(Set2_Challenge10, Basic) {
