@@ -10,6 +10,8 @@
 #include "src/set2.c"
 #include "src/set3.c"
 
+#define PRINT 0 //Prints output in tests where a solution is not provided
+
 //SET 1
 //Challenge 1
 TEST(Set1_Challenge1, Basic) {
@@ -82,7 +84,9 @@ TEST(Set1_Challenge6, Basic) {
 	std::string output = testing::internal::GetCapturedStdout();
 
 	ASSERT_TRUE( ret == 1 );
-	//std::cout << output;
+	#if PRINT
+		std::cout << output;
+	#endif
 }
 
 //Challenge 7 - How to properly test, without the solution?
@@ -96,7 +100,9 @@ TEST(Set1_Challenge7, Basic) {
 	std::string output = testing::internal::GetCapturedStdout();
 
 	ASSERT_TRUE( ret == 1 );
-	//std::cout << output;
+	#if PRINT
+		std::cout << output;
+	#endif
 } 
 
 //Challenge 8 - How to properly test, without the solution?
@@ -109,10 +115,13 @@ TEST(Set1_Challenge8, Basic) {
 	std::string output = testing::internal::GetCapturedStdout();
 
 	ASSERT_TRUE( ret == 1 );
-	//std::cout << output;
+	#if PRINT
+		std::cout << output;
+	#endif
 } 
 
-//Challenge 9
+//SET 2
+/*Challenge 9
 TEST(Set2_Challenge9, Basic) {
 	char pt[]="YELLOW SUBMARINE";
 	int pad = 20;
@@ -125,7 +134,7 @@ TEST(Set2_Challenge9, Basic) {
 
 	ASSERT_TRUE( ret == 1 );
 	ASSERT_TRUE( memcmp(output.c_str(), exp_out, pad) == 0 );
-} 
+} */
 
 //Challenge 10 - How to properly test, without the solution?
 TEST(Set2_Challenge10, Basic) {
@@ -133,12 +142,14 @@ TEST(Set2_Challenge10, Basic) {
 	char key[] = "YELLOW SUBMARINE";
 	int ret = 0;
 	
-	//testing::internal::CaptureStdout();
+	testing::internal::CaptureStdout();
 	ret = challenge10(filename , key);
-	//std::string output = testing::internal::GetCapturedStdout();
+	std::string output = testing::internal::GetCapturedStdout();
 
 	ASSERT_TRUE( ret == 1 );
-	//std::cout << output;
+	#if PRINT
+		std::cout << output;
+	#endif
 } 
 
 //Challenge 11 not done
@@ -179,8 +190,38 @@ TEST(Set2_Challenge15, Basic) {
 	ASSERT_TRUE( output == exp_out3 );
 } 
 
+//Challenge 16 not done
+
+//SET 3
+
+//Challenge 17 not done
+
+//Challenge 18
+TEST(Set2_Challenge18, Basic) {
+	char ct[] = "L77na/nrFsKvynd6HzOoG7GHTLXsTVu9qvY/2syLXzhPweyyMTJULu/6/kXX0KSvoOLSFQ==";
+	char key[] = "YELLOW SUBMARINE";
+	int nounce = 0;
+	int ret = 0;
+
+	testing::internal::CaptureStdout();
+	ret = challenge18(ct , key, nounce);
+	std::string output = testing::internal::GetCapturedStdout();
+
+	ASSERT_TRUE( ret == 1 );
+	#if PRINT
+		std::cout << output;
+	#endif
+}
+
+//Challenge 19 not done
+//Challenge 20 not done
+//Challenge 21 not done
+//Challenge 22 not done
+//Challenge 23 not done
+//Challenge 24 not done
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
+

@@ -10,8 +10,10 @@
 
 #define INF 1000
 #define NCHARS 27
+//English characters. Used to distinguish english-written plaintexts.
 static const char english_famous_chars[NCHARS] = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', ' '};
 
+//Counts how many elements in an array of bytes correspond to a character in the english_famous_char array. 
 int get_score(uint8_t * bytes , int size_bytes)
 {
 	char c;
@@ -30,7 +32,7 @@ int get_score(uint8_t * bytes , int size_bytes)
 	return score;
 }
   
-
+//Breaks single byte xor and returns the key char. Given an array of bytes as ciphertext, check which character as a key would result in a plaintext resembling the english language the most. Uses the number of english textual characters as metric.  
 char break_single_byte_xor(uint8_t * bytes , int size_bytes)
 {
 	int k;
@@ -65,18 +67,15 @@ char break_single_byte_xor(uint8_t * bytes , int size_bytes)
 	return (char)max_k;
 }
 
-//We can make this not dependent on block! 
-//Easy idea: bytes / max
-//Harder idea: bytes / keysize, then normalize. 
-#define BLOCKS 10
-
-int * get_keysize_ranking(uint8_t * bytes , int min, int max)
+//Given an array of bytes of ciphertext, and min/max values for the keysize, produces a ranking of keysizes where the position 0 has the most-likely keysize. The metric used is the hamming distance across keysize-sized blocks of ciphertext. 
+int * get_keysize_ranking(uint8_t * bytes , int bytes_size , int min, int max)
 {
 	int keysize;
 	float * distances = NULL;
 	int * ranking = NULL;
 	float min_val;
 	int min_idx; 
+	int blocks = bytes_size / max; //Number of blocks used to guess the keysize. Can be improved by using each keysize and then normalizing.
 
 	distances = (float *)malloc( max * sizeof(float) ); //0 to min will be unused, but much simpler.
 	if(distances == NULL){
@@ -95,7 +94,7 @@ int * get_keysize_ranking(uint8_t * bytes , int min, int max)
 	for(keysize = min; keysize < max; keysize++){
 
 		//Doing test multiple times
-		for (int i = 0; i < BLOCKS; ++i){
+		for (int i = 0; i < (blocks - 1); ++i){
 			distances[keysize] += hamming_distance(bytes + (i * keysize), bytes + ((i+1) * keysize), keysize);
 		}
 
@@ -132,6 +131,7 @@ int * get_keysize_ranking(uint8_t * bytes , int min, int max)
 	return ranking;
 }
 
+//Breaks repeating key xor encryption. Estimates the keysize using get_keysize_ranking(..), and estimates each byte of the key using break_single_byte_xor(...) to the concatenation of all the bytes encrypted with each key character. 
 char * break_repeat_key_xor(uint8_t * bytes , int bytes_size)
 {
 	uint8_t ** tr_blocks = NULL;
@@ -140,7 +140,7 @@ char * break_repeat_key_xor(uint8_t * bytes , int bytes_size)
 	int * key_ranking = NULL;
 	int keysize;
 
-	key_ranking = get_keysize_ranking(bytes , 2, 40);
+	key_ranking = get_keysize_ranking(bytes , bytes_size , 2, 40);
 	//key_ranking = get_keysize_ranking(bytes , 2, 10);
 	keysize = key_ranking[0];
 	

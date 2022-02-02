@@ -13,7 +13,7 @@ static const int b64invs[] = { 62, -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58,
 						6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 					  	21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1, 26, 27, 28,
 						29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
-						43, 44, 45, 46, 47, 48, 49, 50, 51 };
+						43, 44, 45, 46, 47, 48, 49, 50, 51 }; //80 chars between + and z, however some of them dont exist in b64. We put -1 for placeholder.
 
 //Transforms an hexadecimal string into an array of bytes. 
 //Returns allocated bytes array and its size in size_bytes.
@@ -99,7 +99,7 @@ char * bytes2b64(uint8_t * bytes, int size_bytes)
 		val = (i + 1 < size_bytes) ? val << 8 | bytes[i+1] : val << 8;
 		val = (i + 2 < size_bytes) ? val << 8 | bytes[i+2] : val << 8;
 
-		/*In b64, one char is represented by 6 bits. Right shift followed by & with 0b111111 to separate every 6-bit part */
+		/*In b64, one char codifies 6 bits. Right shift followed by & with 0b111111 to separate every 6-bit part */
 		b64[j] = b64chars[(val >> 18) & 0x3F]; 
 		b64[j+1] = b64chars[(val >> 12) & 0x3F];
 		/*Assure if necessary. Otherwise, pad with =*/
@@ -152,20 +152,22 @@ uint8_t * b642bytes(char * b64, int * size_bytes)
 		}
 	}
 
+	//Malloc bytes array
 	bytes = (uint8_t *)malloc( (*size_bytes) * sizeof(uint8_t));
 	if(bytes == NULL){
 		printf("Error allocating memory for bytes array.\n");
 		return NULL;
 	}	
 	
+	//Decode
 	for(int i=0,j=0; i < b64len ; i+=4 , j+=3){
-		/*  */
-		val = b64invs[b64[i]-43];
+		/* Push (up to) 4 (6-bit) decoded chars into val (assignation and left-shift) */
+		val = b64invs[b64[i]-43]; //Subtract 43 to shift + to be the 0 index. 
 		val = (val << 6) | b64invs[b64[i+1]-43];
 		val = b64[i+2]=='=' ? val << 6 : (val << 6) | b64invs[b64[i+2]-43];
 		val = b64[i+3]=='=' ? val << 6 : (val << 6) | b64invs[b64[i+3]-43];
 
-		/* */
+		/* Right shift followed by & with 0b11111111 to separate every 8-bit part  */
 		bytes[j] = (val >> 16) & 0xFF;
 		if (b64[i+2] != '=')
 			bytes[j+1] = (val >> 8) & 0xFF;
@@ -176,6 +178,9 @@ uint8_t * b642bytes(char * b64, int * size_bytes)
 	return bytes;
 }
 
+//Opens and read an b64 encoded file, ignoring newline characters.
+//Returns allocated bytes array and its size in size_bytes.
+//Returns NULL on error.
 uint8_t * b64file2bytes(char * filename ,int * bytes_size)
 {
 	FILE * fp;
@@ -214,8 +219,8 @@ uint8_t * b64file2bytes(char * filename ,int * bytes_size)
 	}
 	b64[count-1] = '\0'; //Put \0 in the end. I always read one more byte than I want...
 
-	printf("%s" , b64);
-	printf("File size: %d \nRead bytes: %d \nStrlen: %d\n" , filesize , count, (int)strlen(b64));
+	//printf("%s" , b64);
+	//printf("File size: %d \nRead bytes: %d \nStrlen: %d\n" , filesize , count, (int)strlen(b64));
 
 	//Convert b64 to bytes
 	bytes = b642bytes(b64, &(*bytes_size));
@@ -226,7 +231,8 @@ uint8_t * b64file2bytes(char * filename ,int * bytes_size)
 	return bytes;
 }
 
-//Separates contents in a file by the \n. Returns array of strings.
+//Opens and reads a file. 
+//Returns allocated array of strings, with one line in each string, and the number of lines. 
 char ** file2strings(char * filename , int * lines)
 {
 	FILE * fp;
@@ -280,6 +286,8 @@ char ** file2strings(char * filename , int * lines)
 	return strings;
 }
 
+//Transforms an array of bytes into a string.  
+//Returns allocated null-terminated string.
 char * bytes2string(uint8_t * bytes , int bytes_size)
 {
 	char * str = NULL;
@@ -291,6 +299,8 @@ char * bytes2string(uint8_t * bytes , int bytes_size)
 	return str;
 }
 
+//Transforms a string into an array of bytes.  
+//Returns allocated bytes array, and its size.
 uint8_t * string2bytes(char * str , int * bytes_size)
 {
 	uint8_t * bytes = NULL;
@@ -359,19 +369,6 @@ int hamming_distance_byte(uint8_t x, uint8_t y)
 
     return dist;
 }
-
-//Hamming distance between two strings
-/*int hamming_distance_str(char * str1 , char * str2)
-{
-	int i = 0, dist = 0;
-
-    while(str1[i]!='\0' && str2[i]!='\0')
-    {
-        dist += hamming_distance_byte(str1[i], str2[i]);
-        i++;
-    }
-    return dist;
-}*/
 
 //Hamming distance between two byte arrays
 int hamming_distance(uint8_t * bytes1 , uint8_t * bytes2 , int bytes_size)

@@ -16,39 +16,6 @@ int challenge6(char * filename);
 int challenge7(char * filename , char * key);
 int challenge8(char * filename);
 
-//valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./test
-int main()
-{	
-	int ret = 0;
-
-	char in0[] = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
-	//ret = challenge1(in0);
-
-	char in1[] = "1c0111001f010100061a024b53535009181c";
-	char in2[] = "686974207468652062756c6c277320657965";
-	//ret = challenge2(in1,in2);
-
-	char in3[] = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
-	//ret = challenge3(in3);
-
-	char in4[] = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
-	char key0[] = "ICE";
-	//ret = challenge5(in4,key0);
-
-	char filename0[] = "../files/set1-chal6.txt";
-	char filename00[] = "../files/set1-chal6o.txt";
-	ret = challenge6(filename0);
-
-	char filename1[] = "../files/set1-chal7.txt";
-	char key1[] = "YELLOW SUBMARINE";
-	//ret = challenge7(filename1 , key1);
-	
-	char filename2[] = "../files/set1-chal8.txt";
-	//ret = challenge8(filename2);	
-	
-	return ret;
-}
-
 int challenge1(char * in)
 {
 	uint8_t * bytes;
@@ -228,3 +195,37 @@ int challenge8(char * filename)
 
 	return 1;
 }
+
+//valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./test
+/*int main()
+{	
+	int ret = 0;
+	char in0[] = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
+	ret = challenge1(in0);
+
+	char in1[] = "1c0111001f010100061a024b53535009181c";
+	char in2[] = "686974207468652062756c6c277320657965";
+	ret = challenge2(in1,in2);
+
+	char in3[] = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
+	ret = challenge3(in3);
+
+
+	//challenge4 not done
+
+	char in4[] = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
+	char key0[] = "ICE";
+	ret = challenge5(in4,key0);
+
+	char filename0[] = "../files/set1-chal6o.txt";
+	ret = challenge6(filename0);
+
+	char filename1[] = "../files/set1-chal7.txt";
+	char key1[] = "YELLOW SUBMARINE";
+	ret = challenge7(filename1 , key1);
+	
+	char filename2[] = "../files/set1-chal8.txt";
+	ret = challenge8(filename2);	
+	
+	return ret;
+}*/

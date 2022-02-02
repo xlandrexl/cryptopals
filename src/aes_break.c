@@ -7,6 +7,8 @@
 #include "../include/aes.h"
 #include "../include/xor_ciphers.h"
 
+//Counts how many colisions of 16-byte blocks exist in a array of bytes with bytes_size elements. 
+//That is, the sum of repetitions accross all blocks. 
 int count_colisions(uint8_t * bytes , int bytes_size)
 {
 	int cols = 0;
@@ -24,6 +26,7 @@ int count_colisions(uint8_t * bytes , int bytes_size)
 	return cols;
 } 
 
+//Counts how many colisions of 16-byte blocks exist in each array of strings of the strings structure.
 int * count_colisions_strings(char ** strings , int nstrings)
 {
 	int * cols_table = NULL;

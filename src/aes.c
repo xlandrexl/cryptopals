@@ -7,6 +7,8 @@
 #include "../include/aes.h"
 #include "../include/xor_ciphers.h"
 
+//Ciphers a plaintext with AES in 128bit-ECB. 
+//Requires the plaintext with bytes size and equal space for the ciphertext, as well as a key of 16 bits.
 void ecb_encrypt(uint8_t * pt , uint8_t * ct , int bytes , uint8_t key[KEY_SIZE])
 {
 	/* Buffers */
@@ -27,6 +29,8 @@ void ecb_encrypt(uint8_t * pt , uint8_t * ct , int bytes , uint8_t key[KEY_SIZE]
 	return;
 }
 
+//Deiphers a ciphertext with AES in 128bit-ECB. 
+//Requires the ciphertext with bytes size and equal space for the plaintext, as well as a key of 16 bytes.
 void ecb_decrypt(uint8_t * ct , uint8_t * pt , int bytes , uint8_t key[KEY_SIZE])
 {
 	/* Buffers */
@@ -45,6 +49,8 @@ void ecb_decrypt(uint8_t * ct , uint8_t * pt , int bytes , uint8_t key[KEY_SIZE]
 	}
 }
 
+//Ciphers a plaintext with AES in 128bit-CBC. 
+//Requires the plaintext with bytes size and equal space for the ciphertext, as well as a key and initialization vector of 16 bytes.
 void cbc_encrypt(uint8_t * pt , uint8_t * ct , int bytes , uint8_t key[KEY_SIZE] , uint8_t iv[AES_BLOCK_SIZE])
 {
 	/* Buffers */
@@ -75,6 +81,8 @@ void cbc_encrypt(uint8_t * pt , uint8_t * ct , int bytes , uint8_t key[KEY_SIZE]
 	return;
 }
 
+//Deciphers a ciphertext with AES in 128bit-CBC. 
+//Requires the ciphertext with bytes size and equal space for the plaintext, as well as a key and initialization vector of 16 bytes.
 void cbc_decrypt(uint8_t * ct , uint8_t * pt , int bytes , uint8_t key[KEY_SIZE] , uint8_t iv[AES_BLOCK_SIZE])
 {
 	/* Buffers */
@@ -105,14 +113,15 @@ void cbc_decrypt(uint8_t * ct , uint8_t * pt , int bytes , uint8_t key[KEY_SIZE]
 	return;
 }
 
-
+//Ciphers a plaintext with AES in 128bit-CTR. 
+//Requires the plaintext with bytes size and equal space for the ciphertext, as well as a key and a nounce.
 void ctr_encrypt(uint8_t * pt , uint8_t * ct , int bytes , uint8_t key[KEY_SIZE] , uint64_t nonce)
 {
 	uint64_t in[2]; //So we just divide it in 2 easy. nonce || counter
 	uint8_t * out = (uint8_t *)malloc(AES_BLOCK_SIZE * sizeof(uint8_t));
 	int rem_bytes;
 	
-	//Fill buffer with nonce and counter
+	//Fill buffer with nonce
 	in[0] = nonce;
 
 	// Prepare AES-128 bit ECB Encryption 
@@ -124,22 +133,25 @@ void ctr_encrypt(uint8_t * pt , uint8_t * ct , int bytes , uint8_t key[KEY_SIZE]
 		AES_ecb_encrypt((uint8_t*)in, out, &prv_key, AES_ENCRYPT); //Encrypt the "iv" 
 
 		rem_bytes = (bytes - i > 16) ? 16 : bytes - i; //Is there less than 16 bytes in this block?
-	
-		out = fixed_xor(out, pt + (i*AES_BLOCK_SIZE), rem_bytes); //XOR output with plaintext block	
-		memcpy(ct + (i*AES_BLOCK_SIZE) , out , rem_bytes); //Copy it to ct
+
+		out = fixed_xor(out, pt + i, rem_bytes);
+		memcpy(ct + i , out , rem_bytes); //Copy it to ct
+
 		in[1] += 1; //Increment counter
 	}
 
 	free(out);
 }
 
+//Deciphers a ciphertext with AES in 128bit-CTR. 
+//Requires the ciphertext with bytes size and equal space for the plaintext, as well as a key and a nounce.
 void ctr_decrypt(uint8_t * ct , uint8_t * pt , int bytes , uint8_t key[KEY_SIZE] , uint64_t nonce)
 {
 	ctr_encrypt(ct , pt , bytes , key , nonce);
 	return;
 }
 
-
+//Generates a random 16 bytes key in the provided space. 
 void gen_key(uint8_t key[KEY_SIZE])
 {
 	for(int i = 0; i < KEY_SIZE ;i++)
@@ -150,23 +162,36 @@ void gen_key(uint8_t key[KEY_SIZE])
 	return;
 }
 
+//Pads a plaintext of size pt_size until the size ct_size. 
+//Returns realocated plaintext.
 uint8_t * pkcs(uint8_t * pt , int pt_size , int ct_size)
 {
+	uint8_t * temp = NULL;
+
 	int count = ct_size - pt_size;
 	if(count <= 0)
 		return NULL;
 
-	pt = (uint8_t *)realloc(pt, ct_size);
+	//Malloc new pt
+	temp = (uint8_t *)malloc( ct_size * sizeof(uint8_t));
 
+	for(int i = 0 ; i < pt_size ; i++){ //Can be a memcpy
+		temp[i] = pt[i];
+	}
 	for(int i = pt_size ; i < ct_size ; i++){
 		//pt[i] = 'H';
 		//pt[i] = '\x00';
-		pt[i] = count;
+		//temp[i] = count;
+		temp[i] = 'H';
 	}
+
+	free(pt);
 	
-	return pt;
+	return temp;
 }
 
+//Pads the beggining of a plaintext of size pt_size until the size ct_size. 
+//Returns realocated plaintext.
 uint8_t * pkcs_bef(uint8_t * pt , int pt_size , int ct_size)
 {
 	int count = ct_size - pt_size;
@@ -185,7 +210,9 @@ uint8_t * pkcs_bef(uint8_t * pt , int pt_size , int ct_size)
 	return pt;
 }
 
-//Takes as input the plaintext and its size (pt_size)
+//Checks wheter a plaintext is correctly padded, with a before-pad size of pt_size bytes.
+//If correctly padded, returns the unpadded plaintext and valid set to 1. 
+//Otherwise, returns the same plaintext and valid set to 0. 
 uint8_t * validate_pkcs(uint8_t * pt , int * pt_size , int * valid)
 {
 	int count;
@@ -193,7 +220,7 @@ uint8_t * validate_pkcs(uint8_t * pt , int * pt_size , int * valid)
 	//Whats the padding number? Lets check the last index
 	count = pt[ (*pt_size) - 1];
 
-	//Is it a pad number? If not, we can return!
+	//Is it a pad number? If not, we can return. There is no pad to verify!
 	if(count <= 0 || count >= (AES_BLOCK_SIZE)){
 		*valid = 1;
 		return pt;
@@ -216,6 +243,7 @@ uint8_t * validate_pkcs(uint8_t * pt , int * pt_size , int * valid)
 	return pt;
 }
 
+//In proccess.
 uint8_t * ecb_cbc_encrypt(uint8_t * pt , int in_bytes , int * out_bytes)
 {
 	uint8_t key[KEY_SIZE];

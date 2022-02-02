@@ -8,7 +8,7 @@
 #include "../include/aes.h"
 
 //challenge17 not done
-char * challenge18(char * in , char * key , int nounce);
+int challenge18(char * in , char * key , int nounce);
 //challenge19 not done
 //challenge20 not done
 //challenge21 not done
@@ -22,15 +22,14 @@ char * challenge18(char * in , char * key , int nounce);
 	char key[]="YELLOW SUBMARINE";
 	int nounce = 0;
 	char in[] = "L77na/nrFsKvynd6HzOoG7GHTLXsTVu9qvY/2syLXzhPweyyMTJULu/6/kXX0KSvoOLSFQ==";
-
-	char * output = challenge18(in, key, nounce);
-
-	printf("%s\n" , output);
+	int ret = 0;
 	
-	return 0;
+	ret = challenge18(in, key, nounce);
+	
+	return ret;
 }*/
 
-char * challenge18(char * in , char * key , int nounce)
+int challenge18(char * in , char * key , int nounce)
 {
 	//char key[]="YELLOW SUBMARINE";
 	//int nounce = 0;
@@ -46,14 +45,17 @@ char * challenge18(char * in , char * key , int nounce)
 		
 	if(strlen(key) != 16){
 		printf("Key is not 16 bytes\n. Exiting...\n");
-		return NULL;
+		return -1;
 	}
 	ctr_decrypt(ct , pt , pt_size , (uint8_t *)key , nounce);
 
 	str_out = bytes2string(pt , pt_size); 
 	
+	printf("%s" , str_out);
+		
+	free(str_out);
 	free(pt);
 	free(ct);
 
-	return str_out;
+	return 1;
 } 

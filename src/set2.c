@@ -16,40 +16,28 @@ int challenge10(char * filename , char * key);
 int challenge15(char * string);
 //challenge16 not done
 
-/*int main()
+/*
+int main()
 {
-	char key[]={"YELLOW SUBMARINE"};
-	char filename[] = "../files/set1-chal7.txt";
+	int ret = 1;
 
-	int aes_input_size;
-	uint8_t * aes_input = NULL;
-	uint8_t * dec_out = NULL;
-	uint8_t local_key[16];
-	char * str_out;
+	char pt[]="YELLOW SUBMARINE";
+	int pad = 20;
+	ret = challenge9(pt , pad);
 
-	if(strlen(key) != 16){
-		printf("Key is not 16 bytes\n. Exiting...\n");
-		return -1;
-	}
+	char filename[] = "../files/set2-chal10.txt";
+	char key[] = "YELLOW SUBMARINE";
+	ret = challenge10(filename , key);
 
-	strncpy( (char *)local_key, key, 16);
+	char pt1[]="ICE ICE BABY\x04\x04\x04\x04";
+	char pt2[]="ICE ICE BABY\x05\x05\x05\x05";
+	char pt3[]="ICE ICE BABY\x01\x02\x03\x04";
+	ret = challenge15(pt1);
+	ret = challenge15(pt2);
+	ret = challenge15(pt3);
 
-	aes_input = b64file2bytes(filename , &aes_input_size);
-	dec_out = (uint8_t*)malloc(aes_input_size * sizeof(uint8_t));
-
-	ecb_decrypt( aes_input , dec_out, aes_input_size , local_key);
-
-	str_out = bytes2string(dec_out , aes_input_size); 
-
-	printf("%s" , str_out);
-
-	free(str_out);
-	free(dec_out);
-	free(aes_input);
-	
-	return 1;
-}
-*/
+	return ret;
+}*/
 
 int challenge9(char * pt , int n)
 {
@@ -62,8 +50,9 @@ int challenge9(char * pt , int n)
 	
 	bytes = string2bytes(pt, &bytes_size);
 	bytes = pkcs( bytes , bytes_size , n);
+	bytes_size = n;	
 
-	str_out = bytes2string(bytes , bytes_size + n);
+	str_out = bytes2string(bytes , bytes_size);
 
 	printf("%s" , str_out);
 	
@@ -123,6 +112,7 @@ int challenge15(char * plaintext)
 
 	if(valid == 0){
 		printf("inv");
+		free(bytes);
 		return 1;
 	}
 	
