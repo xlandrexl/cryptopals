@@ -20,11 +20,11 @@ int * count_colisions_strings(char ** strings , int nstrings);
 void gen_key(uint8_t key[KEY_SIZE]);
 uint8_t * pkcs(uint8_t * pt , int pt_size , int ct_size);
 uint8_t * pkcs_bef(uint8_t * pt , int pt_size , int ct_size);
-
 uint8_t * validate_pkcs(uint8_t * pt , int * pt_size , int * valid);
 
 
 
-uint8_t * ecb_cbc_encrypt(uint8_t * pt , int in_bytes , int * out_bytes);
+uint8_t * ecb_cbc_encrypt_oracle(uint8_t * pt , int in_bytes , int * out_bytes , int * mode);
+uint8_t * ecb_same_key_encrypt_oracle(uint8_t * pt , int in_bytes , int  * out_bytes);
 
 #endif

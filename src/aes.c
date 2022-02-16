@@ -164,6 +164,7 @@ void gen_key(uint8_t key[KEY_SIZE])
 
 //Pads a plaintext of size pt_size until the size ct_size. 
 //Returns realocated plaintext.
+//Can be imrpvoed by reducing arguments?
 uint8_t * pkcs(uint8_t * pt , int pt_size , int ct_size)
 {
 	uint8_t * temp = NULL;
@@ -191,20 +192,24 @@ uint8_t * pkcs(uint8_t * pt , int pt_size , int ct_size)
 //Returns realocated plaintext.
 uint8_t * pkcs_bef(uint8_t * pt , int pt_size , int ct_size)
 {
+	uint8_t * temp = NULL;
 	int count = ct_size - pt_size;
 	if(count <= 0)
 		return NULL;
 
-	pt = (uint8_t *)realloc(pt, ct_size);
+	//Malloc new pt
+	temp = (uint8_t *)malloc( ct_size * sizeof(uint8_t)); //Can be a realoc
 
-	for(int i = ct_size; i >= count ; i--){
-		pt[i] = pt[i - count];
+	for(int i = ct_size - 1; i >= count ; i--){
+		temp[i] = pt[i - count];
 	}
 	for(int i = 0 ; i < count ; i++){
-		pt[i] = count;
+		temp[i] = count;
 	}
 	
-	return pt;
+	free(pt);
+
+	return temp;
 }
 
 //Checks wheter a plaintext is correctly padded, with a before-pad size of pt_size bytes.
@@ -238,43 +243,4 @@ uint8_t * validate_pkcs(uint8_t * pt , int * pt_size , int * valid)
 	*valid = 1;
 	
 	return pt;
-}
-
-//In proccess.
-uint8_t * ecb_cbc_encrypt(uint8_t * pt , int in_bytes , int * out_bytes)
-{
-	uint8_t key[KEY_SIZE];
-	uint8_t iv[16];
-	int count;
-	uint8_t * ct = NULL;
-
-	//Generate random key
-	gen_key(key);
-
-	//Append before and after
-	count = 5 + (rand() % 6);
-	pt = pkcs(pt , in_bytes , in_bytes + count);
-	in_bytes += count;
-
-	count = 5 + (rand() % 6);
-	pt = pkcs_bef(pt , in_bytes , in_bytes + count);
-	in_bytes += count;
-
-	(*out_bytes) = in_bytes;
-	//Correct to be multiple of AES_BLOCK_SIZE
-	(*out_bytes) -= ( (*out_bytes) % AES_BLOCK_SIZE );
-	
-	//Malloc ct
-	ct = (uint8_t *)malloc( (*out_bytes) * sizeof(uint8_t)); 
-	
-	//Encrypt
-	count = rand() % 2;
-	if(count == 0){ //ECB
-		ecb_encrypt(pt , ct , (*out_bytes) , key);
-	}else{
-		gen_key(iv);
-		cbc_encrypt(pt , ct , (*out_bytes) , key , iv);
-	}
-	
-	return ct;
 }

@@ -9,35 +9,23 @@
 
 int challenge9(char * pt , int n);
 int challenge10(char * filename , char * key);
-//challenge11 not done
-//challenge12 not done
+int challenge11(char * filename , int tries);
+int challenge12(void);
 //challenge13 not done
 //challenge14 not done
 int challenge15(char * string);
 //challenge16 not done
 
-/*
 int main()
 {
 	int ret = 1;
 
-	char pt[]="YELLOW SUBMARINE";
-	int pad = 20;
-	ret = challenge9(pt , pad);
-
-	char filename[] = "../files/set2-chal10.txt";
-	char key[] = "YELLOW SUBMARINE";
-	ret = challenge10(filename , key);
-
-	char pt1[]="ICE ICE BABY\x04\x04\x04\x04";
-	char pt2[]="ICE ICE BABY\x05\x05\x05\x05";
-	char pt3[]="ICE ICE BABY\x01\x02\x03\x04";
-	ret = challenge15(pt1);
-	ret = challenge15(pt2);
-	ret = challenge15(pt3);
+	char filename[] = "../files/set2-chal9.txt";
+	int tries = 1000;
+	ret = challenge12();
 
 	return ret;
-}*/
+}
 
 int challenge9(char * pt , int n)
 {
@@ -81,9 +69,7 @@ int challenge10(char * filename , char * key)
 
 	strncpy( (char *)local_key, key, 16);
 
-	printf("Going in... Filename %s and aes_input_size %d \n" , filename, aes_input_size);
-	aes_input = b64file2bytes(filename , &aes_input_size); //This line is giving error
-	printf("...Out\n");
+	aes_input = b64file2bytes(filename , &aes_input_size); 
 
 	dec_out = (uint8_t*)malloc(aes_input_size * sizeof(uint8_t));
 	cbc_decrypt( aes_input , dec_out, aes_input_size , local_key , iv);
@@ -98,6 +84,112 @@ int challenge10(char * filename , char * key)
 
 	return 1;
 }
+
+int challenge11(char * filename , int tries)
+{
+	//char filename[] = "../files/set2-chal9.txt";
+	//int tries = 20;
+
+	uint8_t * pt = NULL;
+	uint8_t * ct = NULL;
+	int pt_size = 0;
+	int ct_size = 0;
+	int mode = 0;
+	int cols = 0;
+	int correct = 0;
+
+	pt = b64file2bytes(filename , &pt_size); 
+
+	for(int i = 0; i < tries; i++){
+
+		ct = ecb_cbc_encrypt_oracle(pt , pt_size , &ct_size , &mode);
+		cols = count_colisions(ct , ct_size);
+		free(ct);
+
+		if(cols > 0){ //AES-ECB detected!
+			if(mode == 1){ //If in fact was ECB
+				correct++;
+			}
+		}else{ //AES-CBC detected!
+			if(mode == 2){ //If in fact was CBC
+				correct++;
+			}
+		}
+	}
+
+	//Print statistics
+	//printf("Correct guesses: %d / %d (%.2f%%)\n" , correct , tries, (float)correct/tries * 100);
+
+	free(pt);
+
+	return 1;
+} 
+
+int challenge12()
+{
+	char filename[] = "../files/set2-chal9.txt";
+	uint8_t * pt = NULL;
+	uint8_t * ct = NULL;
+	uint8_t * tmp = NULL;
+	uint8_t * tmp_ct = NULL;
+	int pt_size = 0;
+	int ct_size = 0;
+	int tmp_size = 0;
+	int tmp_ct_size = 0;
+
+	int max_block_size = 128;
+	int prev_ct_size;
+	int block_size;
+
+	//Discover block size (Done)
+	pt = (uint8_t *)malloc(max_block_size * sizeof(uint8_t));
+	for(int i = 1; i < max_block_size; i++)
+	{
+		ct = ecb_same_key_encrypt_oracle(pt , i , &ct_size);
+		//printf("Input size: %d | Output size: %d\n" , i , ct_size);
+		if(i != 1 && ct_size != prev_ct_size){
+			block_size = ct_size - prev_ct_size;
+			free(ct);
+			break;
+		}
+		prev_ct_size = ct_size;
+		free(ct);
+	}
+	free(pt);
+	//printf("Block size: %d\n" , block_size);
+
+	//Discover AES (done)
+	
+	//Craft input with one byte short
+	pt_size = 15;
+	pt = (uint8_t *)malloc(pt_size * sizeof(uint8_t));
+	for(int i = 0 ; i < pt_size ; i++){
+		pt[i] = 'A';
+	}
+
+	ct = ecb_same_key_encrypt_oracle(pt , pt_size , &ct_size); //First block of ciphertext will have first byte of unknown string in its last position
+
+	//Brute force all possible last bytes to see which is similar
+	tmp_size = 16;
+	tmp = (uint8_t *)malloc(tmp_size * sizeof(uint8_t));
+	memcpy(tmp , pt , pt_size);
+	for(int i = 0 ; i < 256 ; i++){
+		tmp[15] = i;
+		//Encrypt this tmp
+		tmp_ct = ecb_same_key_encrypt_oracle(tmp , tmp_size , &tmp_ct_size);
+		if(memcmp(tmp , tmp_ct , 16) == 0){
+			printf("Byte found: %c\n" , (char)i);
+			free(tmp_ct);
+			break;
+		}
+		free(tmp_ct);
+	}
+
+	free(pt);
+	free(tmp);
+
+	return 1;
+} 
 
 int challenge15(char * plaintext)
 {
@@ -126,4 +218,24 @@ int challenge15(char * plaintext)
 	return 1;
 }
 
+/*int main()
+{
+	int ret = 1;
 
+	char pt[]="YELLOW SUBMARINE";
+	int pad = 20;
+	ret = challenge9(pt , pad);
+
+	char filename[] = "../files/set2-chal10.txt";
+	char key[] = "YELLOW SUBMARINE";
+	ret = challenge10(filename , key);
+
+	char pt1[]="ICE ICE BABY\x04\x04\x04\x04";
+	char pt2[]="ICE ICE BABY\x05\x05\x05\x05";
+	char pt3[]="ICE ICE BABY\x01\x02\x03\x04";
+	ret = challenge15(pt1);
+	ret = challenge15(pt2);
+	ret = challenge15(pt3);
+
+	return ret;
+}*/

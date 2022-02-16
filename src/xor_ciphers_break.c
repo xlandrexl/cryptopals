@@ -140,7 +140,7 @@ char * break_repeat_key_xor(uint8_t * bytes , int bytes_size)
 	int * key_ranking = NULL;
 	int keysize;
 
-	key_ranking = get_keysize_ranking(bytes , bytes_size , 2, 40);
+	key_ranking = get_keysize_ranking(bytes , bytes_size , 2, 40); //lavesc on tamano entre 2 y 40
 	//key_ranking = get_keysize_ranking(bytes , 2, 10);
 	keysize = key_ranking[0];
 	

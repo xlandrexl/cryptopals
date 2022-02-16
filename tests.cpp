@@ -10,7 +10,7 @@
 #include "src/set2.c"
 #include "src/set3.c"
 
-#define PRINT 0 //Prints output in tests where a solution is not provided
+#define PRINT 1 //Prints output in tests where a solution is not provided
 
 //SET 1
 //Challenge 1
