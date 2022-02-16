@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "../include/basics.h" 
+#include "../include/basics.h"
 #include "../include/xor_ciphers.h"
 #include "../include/aes.h"
 
@@ -35,15 +35,15 @@ int challenge9(char * pt , int n)
 	char * str_out;
 	int bytes_size;
 	uint8_t * bytes;
-	
+
 	bytes = string2bytes(pt, &bytes_size);
 	bytes = pkcs( bytes , bytes_size , n);
-	bytes_size = n;	
+	bytes_size = n;
 
 	str_out = bytes2string(bytes , bytes_size);
 
 	printf("%s" , str_out);
-	
+
 	free(bytes);
 	free(str_out);
 
@@ -69,13 +69,13 @@ int challenge10(char * filename , char * key)
 
 	strncpy( (char *)local_key, key, 16);
 
-	aes_input = b64file2bytes(filename , &aes_input_size); 
+	aes_input = b64file2bytes(filename , &aes_input_size);
 
 	dec_out = (uint8_t*)malloc(aes_input_size * sizeof(uint8_t));
 	cbc_decrypt( aes_input , dec_out, aes_input_size , local_key , iv);
 
-	str_out = bytes2string(dec_out , aes_input_size); 
-	
+	str_out = bytes2string(dec_out , aes_input_size);
+
 	printf("%s" , str_out);
 
 	free(str_out);
@@ -98,7 +98,7 @@ int challenge11(char * filename , int tries)
 	int cols = 0;
 	int correct = 0;
 
-	pt = b64file2bytes(filename , &pt_size); 
+	pt = b64file2bytes(filename , &pt_size);
 
 	for(int i = 0; i < tries; i++){
 
@@ -123,7 +123,7 @@ int challenge11(char * filename , int tries)
 	free(pt);
 
 	return 1;
-} 
+}
 
 int challenge12()
 {
@@ -159,7 +159,7 @@ int challenge12()
 	//printf("Block size: %d\n" , block_size);
 
 	//Discover AES (done)
-	
+
 	//Craft input with one byte short
 	pt_size = 15;
 	pt = (uint8_t *)malloc(pt_size * sizeof(uint8_t));
@@ -189,7 +189,42 @@ int challenge12()
 	free(tmp);
 
 	return 1;
-} 
+}
+
+int challenge13(){
+	uint8_t key[] = "YELLOW SUBMARINE";
+	uint8_t * ct;
+	uint8_t * pt;
+	int pt_size;
+	int ct_size;
+	char mail[] = "foo@bar.com";	//May allow user to provide
+
+	char * encoded_user = profile_for(mail); //Encode. Dont forget to free this.
+	pt * string2bytes(encoded_user , pt_size);
+	free(encoded_user);
+
+	//Encrypt
+	ecb_encrypt_pad(pt , pt_size , ct , &ct_size , key);
+	free(pt);
+
+	/* I CAN ALTER THE CIPHERTEXT */
+	//I will detect how long is the block with what I already have.
+	//I choose a mail that isolates "user" in its own block
+	//I choose a mail with admin PKCS#7 in its own block.
+	//I will copy paste it! Contatenate
+
+	//Decrypt
+	ecb_decrypt_pad(ct , ct_size , pt , &pt_size , key);
+	free(ct);
+
+	//Parse
+	encoded_user = bytes2string(pt , pt_size);
+	free(pt);
+
+	print_json(parse_json(encoded_user));
+
+	return 1;
+}
 
 int challenge15(char * plaintext)
 {
@@ -197,7 +232,7 @@ int challenge15(char * plaintext)
 
 	int bytes_size;
 	uint8_t * bytes = string2bytes(plaintext , &bytes_size);
-	int valid = 0;	
+	int valid = 0;
 	char * str_out;
 
 	bytes = validate_pkcs(bytes , &bytes_size , &valid);
@@ -207,10 +242,10 @@ int challenge15(char * plaintext)
 		free(bytes);
 		return 1;
 	}
-	
+
 	str_out = bytes2string(bytes , bytes_size);
-	
-	printf("%s" , str_out);	
+
+	printf("%s" , str_out);
 
 	free(str_out);
 	free(bytes);
