@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "../include/basics.h" 
+#include "../include/basics.h"
 #include "../include/xor_ciphers.h"
 #include "../include/aes.h"
 
@@ -19,10 +19,10 @@ int challenge8(char * filename);
 int challenge1(char * in)
 {
 	uint8_t * bytes;
-	int size_bytes;	
+	int size_bytes;
 	char * b64;
-	
-	bytes = hex2bytes(in, &size_bytes); 
+
+	bytes = hex2bytes(in, &size_bytes);
 	if(bytes == NULL)
 		return -1;
 
@@ -32,13 +32,13 @@ int challenge1(char * in)
 
 	free(bytes);
 	free(b64);
-	
+
 	return 1;
 }
 
 int challenge2(char * hex1 , char * hex2)
 {
-	int bytes_size;	
+	int bytes_size;
 	uint8_t * bytes1;
 	uint8_t * bytes2;
 	char * hex_out;
@@ -62,7 +62,7 @@ int challenge2(char * hex1 , char * hex2)
 	free(bytes1);
 	free(bytes2);
 	free(hex_out);
-	
+
 	return 1;
 }
 
@@ -76,7 +76,7 @@ int challenge3(char * hex)
 
 	printf("%c" , c);
 
-	free(bytes);	
+	free(bytes);
 
 	return 1;
 }
@@ -114,11 +114,11 @@ int challenge6(char * filename)
 	bytes = b64file2bytes(filename , &bytes_size);
 
 	//Calculate key
-	key = break_repeat_key_xor(bytes , bytes_size);
+	key = break_repeat_key_xor(bytes , bytes_size, -1);
 
 	//Decrypt it
 	decrypted_bytes = repeat_key_xor_cipher(bytes, bytes_size, (uint8_t *)key, strlen(key));
-	
+
 	//Convert to string
 	str_out = bytes2string( decrypted_bytes , bytes_size);
 
@@ -128,7 +128,7 @@ int challenge6(char * filename)
 	free(decrypted_bytes);
 	free(bytes);
 	free(key);
-	
+
 	return 1;
 }
 
@@ -155,7 +155,7 @@ int challenge7(char * filename , char * key)
 
 	ecb_decrypt( aes_input , dec_out, aes_input_size , local_key);
 
-	str_out = bytes2string(dec_out , aes_input_size); 
+	str_out = bytes2string(dec_out , aes_input_size);
 
 	printf("%s" , str_out);
 
@@ -185,7 +185,7 @@ int challenge8(char * filename)
 	}
 
 	printf("%s" , strings[max_idx]);
-	
+
 	//free what we can free
 	for(int i = 0; i < lines ; i++){
 		free(strings[i]);
@@ -198,7 +198,7 @@ int challenge8(char * filename)
 
 //valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind-out.txt ./test
 /*int main()
-{	
+{
 	int ret = 0;
 	char in0[] = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
 	ret = challenge1(in0);
@@ -223,9 +223,9 @@ int challenge8(char * filename)
 	char filename1[] = "../files/set1-chal7.txt";
 	char key1[] = "YELLOW SUBMARINE";
 	ret = challenge7(filename1 , key1);
-	
+
 	char filename2[] = "../files/set1-chal8.txt";
-	ret = challenge8(filename2);	
-	
+	ret = challenge8(filename2);
+
 	return ret;
 }*/

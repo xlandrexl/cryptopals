@@ -9,6 +9,6 @@ uint8_t * repeat_key_xor_cipher(uint8_t * bytes, int bytes_size, uint8_t * key, 
 
 //Public break functions
 char break_single_byte_xor(uint8_t * bytes , int size_bytes);
-char * break_repeat_key_xor(uint8_t * bytes , int size_bytes);
+char * break_repeat_key_xor(uint8_t * bytes , int bytes_size , int fixed_keysize);
 
 #endif

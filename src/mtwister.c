@@ -1,6 +1,8 @@
 #include <stdio.h>
 
-/* Period parameters */  
+#include "../include/basics.h"
+
+/* Period parameters */
 #define N 624
 #define M 397
 #define MATRIX_A 0x9908b0dfUL   /* constant vector a */
@@ -15,8 +17,8 @@ void init_genrand(unsigned long s)
 {
     mt[0]= s & 0xffffffffUL;
     for (mti=1; mti<N; mti++) {
-        mt[mti] = 
-	    (1812433253UL * (mt[mti-1] ^ (mt[mti-1] >> 30)) + mti); 
+        mt[mti] =
+	    (1812433253UL * (mt[mti-1] ^ (mt[mti-1] >> 30)) + mti);
         /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
         /* In the previous versions, MSBs of the seed affect   */
         /* only MSBs of the array mt[].                        */
@@ -52,7 +54,7 @@ unsigned long genrand_int32(void)
 
         mti = 0;
     }
-  
+
     y = mt[mti++];
 
     /* Tempering */

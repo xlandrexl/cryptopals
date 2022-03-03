@@ -3,21 +3,12 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "../include/basics.h" 
-
-#define JSON_CAPACITY 10
-#define STR_SIZE 128
+#include "../include/basics.h"
 #define BUFFER_SIZE 256
-
-typedef struct Json {
-	char names[JSON_CAPACITY][STR_SIZE];
-	char attributes[JSON_CAPACITY][STR_SIZE];
-	int n;
-} Json;
 
 char * profile_for(char * mail)
 {
-	char * buffer;
+	char * buffer = NULL;
 
 	//Verify everything is allright!
 	if(strlen(mail) < 5 || strlen(mail) > (BUFFER_SIZE - 30))
@@ -30,70 +21,78 @@ char * profile_for(char * mail)
 	}
 
 	buffer = (char *)malloc(BUFFER_SIZE * sizeof(char));
+	for(int i = 0; i < BUFFER_SIZE; i++){
+		buffer[i] = '\0';
+	}
+
 	strcat(buffer, "email=");
 	strcat(buffer, mail);
-	strcat(buffer, "&uid=10&role=user");	
-	
-	return buffer;	
+	strcat(buffer, "&uid=10&role=user");
+
+	return buffer;
 }
 
-Json parse_json(char * input){
-	char * p1 = input;
-	char * p2 = p1;
-	int n = 0;
+Json parse_json(char * input)
+{
+	int n;
 	Json json;
-	
+	int u1;
+	int u2;
+
+	//printf("Input: %s\n" , input);
+
+	json.n = 0;
+	u1 = 0;
+	u2 = 0;
+	n = 0;
 	//Find &
 	while(1){
-		while( *p2 != '\0' && *p2 != '=' ){
-			p2++;
+		while( input[u2] != '\0' && input[u2] != '=' ){
+			u2++;
 			n++;
 		}
 
 		//\0 found. Lets return
-		if(*p2 == '\0'){ 
+		if(input[u2] == '\0'){
 			break;
 		}
-		
+
 		//= found. Lets copy between p1 and p2 to names and restart
-		strncpy(json.names[json.n] , p1 , n);
+		strncpy(json.names[json.n] , input + u1 , n - 1);
 		json.names[json.n][n] = '\0';
-		p1 = p2;
+		u1 = u2 + 1;
 		n = 0;
-		
-		while( *p2 != '\0' && *p2 != '&' ){
-			p2++;
+
+		while( input[u2] != '\0' && input[u2] != '&' ){
+			u2++;
 			n++;
 		}
 
-		if(n == 0){ 
+		if(n == 0){
 			break;
-		}		
+		}
 
 		//& found. Lets copy between p1 and p2 to atributes and restart
-		strncpy(json.attributes[json.n] , p1 , n);
-		json.names[json.n][n] = '\0';
+		strncpy(json.attributes[json.n] , input + u1 , n - 1);
+		json.attributes[json.n][n] = '\0';
 		json.n += 1; //This time we also increase number of counts.
-		p1 = p2;
+		u1 = u2 + 1;
 		n = 0;
 
 		//\0 found. Lets return
-		if(*p2 == '\0'){ 
+		if(input[u2] == '\0'){
 			break;
 		}
-
 	}
-		
+
 	return json;
 }
 
-void print_json(Json json){
+void print_json(Json json)
+{
 	for(int i = 0; i < json.n; i++){
 		printf("%s : %s\n" , json.names[i] , json.attributes[i]);
 	}
-	
+
 	return;
 }
-
-
-

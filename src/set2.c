@@ -10,22 +10,22 @@
 int challenge9(char * pt , int n);
 int challenge10(char * filename , char * key);
 int challenge11(char * filename , int tries);
-int challenge12(void);
-//challenge13 not done
-//challenge14 not done
+int challenge12(void); //Works! Can be broken into functions. And leaves trail of A's
+int challenge13(void);
+//challenge14 not done //Ideas in internet! (ECB Byte at a time (Hard))
 int challenge15(char * string);
-//challenge16 not done
+int challenge16(void);
 
-int main()
+/*int main()
 {
 	int ret = 1;
 
-	char filename[] = "../files/set2-chal9.txt";
-	int tries = 1000;
-	ret = challenge12();
+	//char filename[] = "../files/set2-chal9.txt";
+	//int tries = 1000;
+	ret = challenge16();
 
 	return ret;
-}
+}*/
 
 int challenge9(char * pt , int n)
 {
@@ -118,7 +118,7 @@ int challenge11(char * filename , int tries)
 	}
 
 	//Print statistics
-	//printf("Correct guesses: %d / %d (%.2f%%)\n" , correct , tries, (float)correct/tries * 100);
+	printf("Correct guesses: %d / %d (%.2f%%)\n" , correct , tries, (float)correct/tries * 100);
 
 	free(pt);
 
@@ -127,7 +127,6 @@ int challenge11(char * filename , int tries)
 
 int challenge12()
 {
-	char filename[] = "../files/set2-chal9.txt";
 	uint8_t * pt = NULL;
 	uint8_t * ct = NULL;
 	uint8_t * tmp = NULL;
@@ -136,10 +135,13 @@ int challenge12()
 	int ct_size = 0;
 	int tmp_size = 0;
 	int tmp_ct_size = 0;
-
+	int cols = 0;
 	int max_block_size = 128;
-	int prev_ct_size;
+	int prev_ct_size = -1;
 	int block_size;
+
+	int string_blocks;
+	uint8_t * string_bytes;
 
 	//Discover block size (Done)
 	pt = (uint8_t *)malloc(max_block_size * sizeof(uint8_t));
@@ -156,75 +158,122 @@ int challenge12()
 		free(ct);
 	}
 	free(pt);
-	//printf("Block size: %d\n" , block_size);
+	printf("Block size: %d\n" , block_size);
 
 	//Discover AES (done)
-
-	//Craft input with one byte short
-	pt_size = 15;
+	pt_size = max_block_size * 16;
 	pt = (uint8_t *)malloc(pt_size * sizeof(uint8_t));
-	for(int i = 0 ; i < pt_size ; i++){
-		pt[i] = 'A';
+	for(int i = 0; i < pt_size ; i++){
+ 		pt[i] = 'A';
 	}
-
-	ct = ecb_same_key_encrypt_oracle(pt , pt_size , &ct_size); //First block of ciphertext will have first byte of unknown string in its last position
-
-	//Brute force all possible last bytes to see which is similar
-	tmp_size = 16;
-	tmp = (uint8_t *)malloc(tmp_size * sizeof(uint8_t));
-	memcpy(tmp , pt , pt_size);
-	for(int i = 0 ; i < 256 ; i++){
-		tmp[15] = i;
-		//Encrypt this tmp
-		tmp_ct = ecb_same_key_encrypt_oracle(tmp , tmp_size , &tmp_ct_size);
-		if(memcmp(tmp , tmp_ct , 16) == 0){
-			printf("Byte found: %c\n" , (char)i);
-			free(tmp_ct);
-			break;
-		}
-		free(tmp_ct);
+	ct = ecb_same_key_encrypt_oracle(pt , pt_size , &ct_size);
+	cols = count_colisions(ct , ct_size);
+	if(cols > 0){
+		printf("AES-ECB Detected\n");
 	}
-
 	free(pt);
-	free(tmp);
-
-	return 1;
-}
-
-int challenge13(){
-	uint8_t key[] = "YELLOW SUBMARINE";
-	uint8_t * ct;
-	uint8_t * pt;
-	int pt_size;
-	int ct_size;
-	char mail[] = "foo@bar.com";	//May allow user to provide
-
-	char * encoded_user = profile_for(mail); //Encode. Dont forget to free this.
-	pt * string2bytes(encoded_user , pt_size);
-	free(encoded_user);
-
-	//Encrypt
-	ecb_encrypt_pad(pt , pt_size , ct , &ct_size , key);
-	free(pt);
-
-	/* I CAN ALTER THE CIPHERTEXT */
-	//I will detect how long is the block with what I already have.
-	//I choose a mail that isolates "user" in its own block
-	//I choose a mail with admin PKCS#7 in its own block.
-	//I will copy paste it! Contatenate
-
-	//Decrypt
-	ecb_decrypt_pad(ct , ct_size , pt , &pt_size , key);
 	free(ct);
 
-	//Parse
-	encoded_user = bytes2string(pt , pt_size);
-	free(pt);
+	//Discover length of strings
+	ct = ecb_same_key_encrypt_oracle(pt , 0 , &string_blocks);
+	string_blocks = string_blocks / 16;
+	printf("String blocks: %d\n" , string_blocks);
 
-	print_json(parse_json(encoded_user));
+	//Discover Bytes Loop
+	string_bytes = (uint8_t *)malloc(string_blocks * 16 * sizeof(uint8_t));
+	for(int blocks = 0; blocks < 2 ; blocks++ )
+	{
+		//Discover Bytes' bits Loop
+		for(int k = 0 ; k < 15 ; k++){
+			//Craft input with one byte short
+			pt_size = 15-k;
+			pt = (uint8_t *)malloc(pt_size * sizeof(uint8_t));
+			for(int i = 0 ; i < pt_size; i++){
+				pt[i] = 'A';
+			}
+
+			ct = ecb_same_key_encrypt_oracle(pt , pt_size , &ct_size); //First block of ciphertext will have first byte of unknown string in its last position
+
+			//Brute force all possible last bytes to see which is similar
+			tmp_size = 16;
+			tmp = (uint8_t *)malloc(tmp_size * sizeof(uint8_t));
+			memcpy(tmp , pt , pt_size);
+
+			//Copy already discovered bytes
+			for(int i = 15-k,z=0 ; i < 15 ; i++, z++){
+				tmp[i] = string_bytes[16*blocks + z];
+			}
+
+			for(int i = 0 ; i < 256 ; i++){
+				tmp[15] = i;
+				//Encrypt this tmp
+				tmp_ct = ecb_same_key_encrypt_oracle(tmp , tmp_size , &tmp_ct_size);
+
+				if(memcmp(ct + (blocks*16) , tmp_ct , 16) == 0){
+					//printf("Byte found: %c (%d)\n" , (char)i , i);
+					string_bytes[16*blocks + k] = i;
+					free(tmp_ct);
+					break;
+				}
+				free(tmp_ct);
+			}
+			free(pt);
+			free(tmp);
+		}
+	}
+
+	print_char(string_bytes, string_blocks * 16);
+	printf("\n");
+
+	free(string_bytes);
 
 	return 1;
 }
+
+int challenge13()
+{
+	uint8_t * ct1;
+	int ct1_size;
+	uint8_t * ct2;
+	int ct2_size;
+	Json user;
+	uint8_t * ct_final;
+	int ct_final_size;
+
+	//Users are encoded as: email=foo@bar.com&uid=10&role=user
+	//email=foo@bar.com&uid=10&role=  has 30 bytes. Lets add 2 more to make 32.
+	//email=foooo@bar.com&uid=10&role=  has 32 bytes. (BLOCKS [A][B])
+	char mail1[] = "foooo@bar.com";
+	ct1 = ecb_encrypt_encode(mail1 , &ct1_size);
+	//user = ecb_decrypt_parse(ct1 ,ct1_size);print_json(user);printf("\n\n");
+
+	//fo@bar.comadmin isolate  admin__________ in one BLOCK [C]
+	char mail2[] = "fo@bar.comadmin\x0B\x0B\x0B\x0B\x0B\x0B\x0B\x0B\x0B\x0B\x0B";
+	ct2 = ecb_encrypt_encode(mail2 , &ct2_size);
+	//user = ecb_decrypt_parse(ct2 ,ct2_size);print_json(user);printf("\n\n");
+
+	//Paste block at its place [A][B][C]
+	ct_final_size = 3 * 16;
+	ct_final = (uint8_t *)malloc(ct_final_size * sizeof(uint8_t));
+
+	for(int i = 0; i < 32; i++){
+		ct_final[i] = ct1[i];
+	}
+	for(int i = 32; i < 48; i++){
+		ct_final[i] = ct2[i-16];
+	}
+
+	user = ecb_decrypt_parse(ct_final , ct_final_size);
+	free(ct1);
+	free(ct2);
+	free(ct_final);
+
+	print_json(user);
+
+	return 1;
+}
+
+//Challenge 14 not done
 
 int challenge15(char * plaintext)
 {
@@ -249,6 +298,43 @@ int challenge15(char * plaintext)
 
 	free(str_out);
 	free(bytes);
+
+	return 1;
+}
+
+int challenge16()
+{
+	uint8_t iv[AES_BLOCK_SIZE] = "GREEN SUBMARINE";
+	char string[] = "I dont really care about this string";
+	uint8_t * ct;
+	int ct_size;
+	uint8_t pt1[AES_BLOCK_SIZE] = "comment1=cooking";
+	uint8_t ptd[AES_BLOCK_SIZE] = "aa;admin=true;aa";
+	uint8_t ctd[AES_BLOCK_SIZE];
+	uint8_t ivd[AES_BLOCK_SIZE];
+	int ret;
+
+	ct = cbc_flip_encrypt_oracle(string , &ct_size , iv);
+
+  //ctd = pt1 XOR iv
+	for(int i = 0; i < AES_BLOCK_SIZE; i++){
+		ctd[i] = pt1[i] ^ iv[i];
+	}
+
+	//ivd = ctd XOR ptd
+	for(int i = 0; i < AES_BLOCK_SIZE; i++){
+		ivd[i] = ctd[i] ^ ptd[i];
+	}
+
+	ret = cbc_flip_check_oracle( ct , ct_size , ivd);
+
+	if(ret == 1){
+		printf("Found! I am admin.\n");
+	}else{
+		printf("Not found! I am not admin.\n");
+	}
+
+	free(ct);
 
 	return 1;
 }
