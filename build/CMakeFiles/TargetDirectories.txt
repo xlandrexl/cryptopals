@@ -1,3 +1,0 @@
-/home/aleitao/Desktop/cryptopals/build/CMakeFiles/rebuild_cache.dir
-/home/aleitao/Desktop/cryptopals/build/CMakeFiles/test.dir
-/home/aleitao/Desktop/cryptopals/build/CMakeFiles/edit_cache.dir

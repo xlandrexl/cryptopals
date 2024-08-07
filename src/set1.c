@@ -3,18 +3,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "../include/set1.h"
 #include "../include/basics.h"
 #include "../include/xor_ciphers.h"
 #include "../include/aes.h"
-
-int challenge1(char * in);
-int challenge2(char * hex1 , char * hex2);
-int challenge3(char * hex);
-//challenge4 not done
-int challenge5(char * in , char * key);
-int challenge6(char * filename);
-int challenge7(char * filename , char * key);
-int challenge8(char * filename);
 
 int challenge1(char * in)
 {
