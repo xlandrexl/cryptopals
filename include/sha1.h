@@ -1,30 +1,42 @@
-#ifndef _SHA1_H_
-#define _SHA1_H_
+#ifndef SHA1_H
+#define SHA1_H
 
-/*
- *  This structure will hold context information for the hashing
- *  operation
- */
-typedef struct SHA1Context
+#include "stdint.h"
+
+typedef struct
 {
-    unsigned Message_Digest[5]; /* Message Digest (output)          */
+    uint32_t state[5];
+    uint32_t count[2];
+    unsigned char buffer[64];
+} SHA1_CTX;
 
-    unsigned Length_Low;        /* Message length in bits           */
-    unsigned Length_High;       /* Message length in bits           */
+// Private
+void SHA1Transform(
+    uint32_t state[5],
+    const unsigned char buffer[64]
+    );
 
-    unsigned char Message_Block[64]; /* 512-bit message blocks      */
-    int Message_Block_Index;    /* Index into message block array   */
+void SHA1Init(
+    SHA1_CTX * context
+    );
 
-    int Computed;               /* Is the digest computed?          */
-    int Corrupted;              /* Is the message digest corruped?  */
-} SHA1Context;
+void SHA1Update(
+    SHA1_CTX * context,
+    const unsigned char *data,
+    uint32_t len
+    );
 
-//Their functions
-void SHA1Reset(SHA1Context *);
-int SHA1Result(SHA1Context *);
-void SHA1Input( SHA1Context *,const unsigned char *,unsigned);
+void SHA1Final(
+    unsigned char digest[20],
+    SHA1_CTX * context
+    );
 
-//My functions
-char * authenticate_message(char * message);
 
-#endif
+
+// Public
+void _SHA1(char *hash_out,    const char *str,    uint32_t len);
+void SHA1(char * hexresult, char const string[]);
+char * secret_prefix_mac_sha1(char * key, char * message);
+
+#endif /* SHA1_H */
+

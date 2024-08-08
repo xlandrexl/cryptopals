@@ -65,17 +65,3 @@ unsigned long genrand_int32(void)
 
     return y;
 }
-
-/*int main(void)
-{
-    int i;
-    init_genrand(1234);
-
-    printf("1000 outputs of genrand_int32()\n");
-    for (i=0; i<1000; i++) {
-      printf("%10lu ", genrand_int32());
-      if (i%20 == 0) printf("\n");
-    }
-
-    return 0;
-}*/

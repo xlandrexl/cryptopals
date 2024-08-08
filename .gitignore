@@ -2,3 +2,10 @@
 src/Makefile
 src/test
 
+# Temp
+
+temp/
+temp/*
+
+# Token
+TOKEN
